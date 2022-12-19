@@ -8,6 +8,10 @@
 
 [License]: https://img.shields.io/badge/License-MIT-blue.svg
 
+## Contracts
+
+- [ETH Light Client](contracts/eth-light-client)
+
 ## License
 
 Licensed under [MIT License].

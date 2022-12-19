@@ -1,0 +1,18 @@
+[package]
+name = "ibc-ckb_contracts-test_utils"
+version = "0.1.0-alpha.0"
+authors = ["Boyu Yang <yangby@cryptape.com>"]
+edition = "2021"
+license = "MIT"
+description = "Utilities for testing IBC CKB contracts."
+homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+
+[dependencies]
+ckb-script    = "0.105.1"
+ckb-types     = "0.105.1"
+ckb-db        = "0.105.1"
+ckb-db-schema = "0.105.1"
+ckb-store     = "0.105.1"
+ckb-error     = "0.105.1"
+tempfile = "3.3.0"

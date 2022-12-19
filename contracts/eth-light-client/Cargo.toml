@@ -1,0 +1,22 @@
+cargo-features = ["per-package-target"]
+
+[package]
+name = "ibc-ckb_contracts-eth_light_client"
+version = "0.1.0-alpha.0"
+authors = ["Boyu Yang <yangby@cryptape.com>"]
+edition = "2021"
+license = "MIT"
+description = "An IBC implementation of ETH light client in CKB contract."
+homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+default-target = "riscv64imac-unknown-none-elf"
+
+[dependencies]
+ckb-std = "0.10.0"
+
+[profile.release]
+overflow-checks = true
+lto = false
+codegen-units = 1
+panic = 'abort'
+strip = true
