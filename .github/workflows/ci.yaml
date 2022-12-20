@@ -1,0 +1,108 @@
+name: CI
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+defaults:
+  run:
+    shell: bash
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  RUST_BACKTRACE: full
+  RUST_TOOLCHAIN: 1.66.0
+jobs:
+  #
+  # Contracts
+  #
+  format-contracts:
+    name: Checks / Format (contracts)
+    runs-on: ubuntu-latest
+    container:
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the Checker
+        run: make format-all-contracts
+  lint-contracts:
+    name: Checks / Lint (contracts)
+    runs-on: ubuntu-latest
+    container:
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run the Checker
+        run: make lint-all-contracts
+  build-contracts:
+    name: Build (contracts)
+    needs: [ format-contracts, lint-contracts ]
+    runs-on: ubuntu-latest
+    container:
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: make all-contracts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: all-contracts
+          path: build
+  #
+  # Test Utils
+  #
+  format-test-utils:
+    name: Checks / Format (test-utils)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set Rust Toolchain
+        run: |
+          rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
+          rustup default ${{ env.RUST_TOOLCHAIN }}
+          rustup component add rustfmt
+      - name: Run the Checker
+        run: |
+          cd test-utils
+          cargo fmt --all -- --check
+  lint-test-utils:
+    name: Checks / Lint (test-utils)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set Rust Toolchain
+        run: |
+          rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
+          rustup default ${{ env.RUST_TOOLCHAIN }}
+          rustup component add clippy
+      - name: Run the Checker
+        run: |
+          cd test-utils
+          cargo clippy -- --deny warnings
+  #
+  # Run Tests
+  #
+  run-tests:
+    name: Tests / Build & Test
+    needs: [ build-contracts, format-test-utils, lint-test-utils ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Set Rust Toolchain
+        run: |
+          rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
+          rustup default ${{ env.RUST_TOOLCHAIN }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: all-contracts
+          path: build
+      - name: Run the Tests
+        run: |
+          cd test-utils
+          cargo test --no-fail-fast
