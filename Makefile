@@ -3,10 +3,17 @@ BUILD_ENV_DOCKER := yangby0cryptape/ibc-ckb-contracts-build-env@sha256:7047fe6e5
 RUST_TOOLCHAIN_TARGET := riscv64imac-unknown-none-elf
 PROJECT_PREFIX := ibc-ckb_contracts
 
+# Enable Debugging with `export CARGO_BUILD_ARGS="--features debugging"`.
+CARGO_BUILD_ARGS ?=
+
 CONTRACTS_DIR := contracts
 OUTPUT_DIR := build
 
-ALL_CONTRACTS := eth-light-client
+ALL_CONTRACTS := \
+    mock_contracts-reverse_args_lock \
+    eth_light_client-client_type_lock \
+    eth_light_client-verify_bin \
+    eth_light_client-mock_business_type_lock
 
 .PHONY: all-contracts all-contracts-in-docker
 all-contracts: ${ALL_CONTRACTS}
@@ -19,8 +26,10 @@ clean-all-contracts:
 .PHONY: clean-all-contracts-targets clean-all-contracts-targets-in-docker
 clean-all-contracts-targets:
 	@set -eu; \
+		rootdir="$$(pwd)"; \
 		for contract in ${ALL_CONTRACTS}; do \
-			cd "${CONTRACTS_DIR}/$${contract}"; cargo clean; cd ../; \
+			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
+			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clean; cd "$${rootdir}"; \
 		done
 clean-all-contracts-targets-in-docker:
 	@docker run --rm -v "$$(pwd):/code" -w "/code" "${BUILD_ENV_DOCKER}" bash -c "make $(subst -in-docker,,$@)"
@@ -28,9 +37,11 @@ clean-all-contracts-targets-in-docker:
 .PHONY: format-all-contracts format-all-contracts-in-docker
 format-all-contracts:
 	@set -eu; \
+		rootdir="$$(pwd)"; \
 		for contract in ${ALL_CONTRACTS}; do \
 			echo ">>> Format-check \"$${contract}\" contract ..."; \
-			cd "${CONTRACTS_DIR}/$${contract}"; cargo fmt --all -- --check; cd ../; \
+			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
+			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo fmt --all -- --check; cd "$${rootdir}"; \
 		done; \
 		echo "[DONE] Format-check all contracts."
 format-all-contracts-in-docker:
@@ -39,9 +50,11 @@ format-all-contracts-in-docker:
 .PHONY: lint-all-contracts lint-all-contracts-in-docker
 lint-all-contracts:
 	@set -eu; \
+		rootdir="$$(pwd)"; \
 		for contract in ${ALL_CONTRACTS}; do \
 			echo ">>> Lint \"$${contract}\" contract ..."; \
-			cd "${CONTRACTS_DIR}/$${contract}"; cargo clippy --locked -- --deny warnings; cd ../; \
+			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
+			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clippy --locked -- --deny warnings; cd "$${rootdir}"; \
 		done; \
 		echo "[DONE] Lint all contracts."
 lint-all-contracts-in-docker:
@@ -49,11 +62,13 @@ lint-all-contracts-in-docker:
 
 ${OUTPUT_DIR}/%:
 	@set -eu; \
+		rootdir="$$(pwd)"; \
 		contract_name="$(notdir $@)"; \
-		contract_filename="${PROJECT_PREFIX}-$(subst -,_,$(notdir $@))"; \
-		cd "${CONTRACTS_DIR}/$${contract_name}"; \
-			cargo build --release; \
-			cp "target/${RUST_TOOLCHAIN_TARGET}/release/$${contract_filename}" "../../${OUTPUT_DIR}/$${contract_name}"; \
+		contract_filename="${PROJECT_PREFIX}-$${contract_name}"; \
+		contract_dir=$$(echo "$${contract_name}" | tr -s '-' '/'); \
+		cd "${CONTRACTS_DIR}/$${contract_dir}"; \
+			cargo build --release ${CARGO_BUILD_ARGS}; \
+			cp "target/${RUST_TOOLCHAIN_TARGET}/release/$${contract_filename}" "$${rootdir}/${OUTPUT_DIR}/$${contract_name}"; \
 			cd ..;
 
 %-in-docker:
@@ -67,5 +82,14 @@ ${OUTPUT_DIR}/%:
 # Targets to Build Contracts
 #
 
-.PHONY: eth-light-client
-eth-light-client: ${OUTPUT_DIR}/eth-light-client
+.PHONY: mock_contracts-reverse_args_lock
+mock_contracts-reverse_args_lock: ${OUTPUT_DIR}/mock_contracts-reverse_args_lock
+
+.PHONY: eth_light_client-client_type_lock
+eth_light_client-client_type_lock: ${OUTPUT_DIR}/eth_light_client-client_type_lock
+
+.PHONY: eth_light_client-verify_bin
+eth_light_client-verify_bin: ${OUTPUT_DIR}/eth_light_client-verify_bin
+
+.PHONY: eth_light_client-mock_business_type_lock
+eth_light_client-mock_business_type_lock: ${OUTPUT_DIR}/eth_light_client-mock_business_type_lock

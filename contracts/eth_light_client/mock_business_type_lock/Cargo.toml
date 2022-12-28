@@ -1,0 +1,27 @@
+cargo-features = ["per-package-target"]
+
+[package]
+name = "ibc-ckb_contracts-eth_light_client-mock_business_type_lock"
+version = "0.1.0-alpha.0"
+authors = ["Boyu Yang <yangby@cryptape.com>"]
+edition = "2021"
+license = "MIT"
+description = "An IBC implementation of ETH light client in CKB contract (testing part)."
+homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+default-target = "riscv64imac-unknown-none-elf"
+
+[dependencies]
+ckb-std = "0.10.0"
+eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/yangby-cryptape/eth-light-client-in-ckb", rev = "c995a32" }
+
+[features]
+default = []
+debugging = []
+
+[profile.release]
+overflow-checks = true
+lto = false
+codegen-units = 1
+panic = 'abort'
+strip = true

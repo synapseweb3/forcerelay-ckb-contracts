@@ -1,18 +1,22 @@
 cargo-features = ["per-package-target"]
 
 [package]
-name = "ibc-ckb_contracts-eth_light_client"
+name = "ibc-ckb_contracts-mock_contracts-reverse_args_lock"
 version = "0.1.0-alpha.0"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
-description = "An IBC implementation of ETH light client in CKB contract."
+description = "This contract is a mock contract, and it is used for testing."
 homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
 repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
 default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
 ckb-std = "0.10.0"
+
+[features]
+default = []
+debugging = []
 
 [profile.release]
 overflow-checks = true

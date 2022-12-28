@@ -59,7 +59,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b365fabc795046672053e29c954733ec3b05e4be654ab130fe8f1f94d7051f35"
 
 [[package]]
-name = "ibc-ckb_contracts-eth_light_client"
+name = "ibc-ckb_contracts-mock_contracts-reverse_args_lock"
 version = "0.1.0-alpha.0"
 dependencies = [
  "ckb-std",

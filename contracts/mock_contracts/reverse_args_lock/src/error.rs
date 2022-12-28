@@ -11,6 +11,10 @@ pub enum Error {
     LengthNotEnough,
     Encoding,
     UnknownSysError,
+
+    WitnessIsNotExisted,
+    WitnessIsIncorrect,
+    WitnessIsEmpty,
 }
 
 impl From<SysError> for Error {

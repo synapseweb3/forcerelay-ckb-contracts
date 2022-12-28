@@ -105,4 +105,4 @@ jobs:
       - name: Run the Tests
         run: |
           cd test-utils
-          cargo test --no-fail-fast
+          cargo test --no-fail-fast -- --nocapture --test-threads 1
