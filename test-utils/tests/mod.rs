@@ -15,3 +15,25 @@ pub(crate) fn setup() {
         .try_init();
     println!();
 }
+
+pub(crate) mod prelude {
+    use ckb_error::Error;
+    use ckb_types::core::Cycle;
+
+    pub(crate) trait IsVerifyResult {
+        fn should_be_ok(&self);
+    }
+
+    impl IsVerifyResult for Result<Cycle, Error> {
+        fn should_be_ok(&self) {
+            match self {
+                Ok(cycles) => {
+                    println!("Cost: {} cycles", cycles);
+                }
+                Err(reason) => {
+                    panic!("Failed since: {}", reason);
+                }
+            }
+        }
+    }
+}

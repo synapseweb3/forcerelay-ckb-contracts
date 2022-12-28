@@ -7,11 +7,11 @@ use ibc_ckb_contracts_test_utils::{
 };
 
 use super::REVERSE_ARGS_LOCK_CONTRACT;
-use crate::setup;
+use crate::prelude::*;
 
 #[test]
 fn test() {
-    setup();
+    crate::setup();
 
     let args_bytes = misc::random_bytes();
     let args: packed::Bytes = args_bytes.pack();
@@ -66,5 +66,5 @@ fn test() {
     let verifier = Verifier::default();
     let result = verifier.verify_without_limit(&rtx);
 
-    assert!(result.is_ok());
+    result.should_be_ok();
 }

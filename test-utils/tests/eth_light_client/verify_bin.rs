@@ -15,11 +15,11 @@ use ibc_ckb_contracts_test_utils::{
 use super::{
     CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR, MOCK_BUSINESS_TYPE_LOCK_CONTRACT, VERIFY_BIN_CONTRACT,
 };
-use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, setup};
+use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, prelude::*};
 
 #[test]
 fn test() {
-    setup();
+    crate::setup();
 
     let client_id = misc::random_hash().raw_data().to_vec();
 
@@ -134,5 +134,5 @@ fn test() {
     let verifier = Verifier::default();
     let result = verifier.verify_without_limit(&rtx);
 
-    assert!(result.is_ok());
+    result.should_be_ok();
 }

@@ -40,6 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+    env:
+      CARGO_BUILD_ARGS: --features debugging
     steps:
       - uses: actions/checkout@v2
       - name: Build
