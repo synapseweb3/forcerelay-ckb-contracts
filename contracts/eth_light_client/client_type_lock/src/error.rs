@@ -13,8 +13,9 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
-    ClientShouldHasTypeScript,
-    TypeShouldNotChangeWhenNoLockWitness,
+    ClientShouldBeUniqueInInputs,
+    ClientShouldBeUniqueInOutputs,
+    UnknownOperation,
     WitnessIsNotExisted,
     ProofUpdateError,
     NewClientIsIncorrect,

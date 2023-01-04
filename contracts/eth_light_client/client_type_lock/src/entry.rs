@@ -7,60 +7,89 @@ use eth_light_client_in_ckb_verification::types::{
 
 use crate::error::{Error, Result};
 
-const CLIENT_INDEX: usize = 0;
-const NEW_CLIENT_INDEX: usize = 0;
-
 pub fn main() -> Result<()> {
     debug!("{} Starting ...", module_path!());
 
-    let client: Client = {
-        let data = hl::load_cell_data(CLIENT_INDEX, Source::Input)?;
-        let client = ClientReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
-        debug!("packed client = {}", client);
-        client.unpack()
-    };
+    let script_hash = hl::load_script_hash()?;
+    debug!("script hash = {:#x}", script_hash.pack());
 
-    let witness_args = hl::load_witness_args(CLIENT_INDEX, Source::Input)?;
+    let mut client_cell_index_opt = None;
+    let mut new_client_cell_index_opt = None;
 
-    if witness_args.lock().is_none() {
-        let client_type_hash =
-            if let Some(client_type_hash) = hl::load_cell_type_hash(CLIENT_INDEX, Source::Input)? {
-                client_type_hash
-            } else {
-                return Err(Error::ClientShouldHasTypeScript);
-            };
-        if let Some(new_client_type_hash) =
-            hl::load_cell_type_hash(NEW_CLIENT_INDEX, Source::Output)?
-        {
-            if client_type_hash != new_client_type_hash {
-                return Err(Error::TypeShouldNotChangeWhenNoLockWitness);
+    for (index, type_hash_opt) in
+        hl::QueryIter::new(hl::load_cell_type_hash, Source::Input).enumerate()
+    {
+        if let Some(type_hash) = type_hash_opt {
+            debug!("{}-th type hash of inputs: {:#x}", index, type_hash.pack());
+            if type_hash == script_hash.as_slice() {
+                debug!("found client cell from inputs: {}", index);
+                if client_cell_index_opt.is_none() {
+                    client_cell_index_opt = Some(index);
+                } else {
+                    return Err(Error::ClientShouldBeUniqueInInputs);
+                }
             }
-        } else {
-            return Err(Error::TypeShouldNotChangeWhenNoLockWitness);
         }
     }
 
-    let actual_new_client = if let Some(args) = witness_args.input_type().to_opt() {
-        let data = args.raw_data();
-        let proof_update = ProofUpdateReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
-        debug!(
-            "packed proof update size = {}",
-            proof_update.as_slice().len()
-        );
-        client.try_apply_packed_proof_update(proof_update)?
+    for (index, type_hash_opt) in
+        hl::QueryIter::new(hl::load_cell_type_hash, Source::Output).enumerate()
+    {
+        if let Some(type_hash) = type_hash_opt {
+            debug!("{}-th type hash of outputs: {:#x}", index, type_hash.pack());
+            if type_hash == script_hash.as_slice() {
+                debug!("found client cell from outputs: {}", index);
+                if new_client_cell_index_opt.is_none() {
+                    new_client_cell_index_opt = Some(index);
+                } else {
+                    return Err(Error::ClientShouldBeUniqueInOutputs);
+                }
+            }
+        }
+    }
+
+    if let Some(new_client_cell_index) = new_client_cell_index_opt {
+        let witness_args = hl::load_witness_args(new_client_cell_index, Source::Output)?;
+        let actual_new_client = if let Some(args) = witness_args.input_type().to_opt() {
+            let data = args.raw_data();
+            let proof_update =
+                ProofUpdateReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
+            debug!(
+                "packed proof update size = {}",
+                proof_update.as_slice().len()
+            );
+
+            if let Some(client_cell_index) = client_cell_index_opt {
+                let input_data = hl::load_cell_data(client_cell_index, Source::Input)?;
+                let client: Client = {
+                    let client =
+                        ClientReader::from_slice(&input_data).map_err(|_| SysError::Encoding)?;
+                    debug!("packed client = {}", client);
+                    client.unpack()
+                };
+                client.try_apply_packed_proof_update(proof_update)
+            } else {
+                Client::new_from_packed_proof_update(proof_update)
+            }?
+        } else {
+            return Err(Error::WitnessIsNotExisted);
+        };
+
+        let actual = actual_new_client.pack();
+        debug!("actual packed new client = {}", actual);
+
+        let output_data = hl::load_cell_data(new_client_cell_index, Source::Output)?;
+        let expected = ClientReader::from_slice(&output_data).map_err(|_| SysError::Encoding)?;
+        debug!("expected packed new client = {}", expected);
+
+        if actual.as_slice() != expected.as_slice() {
+            return Err(Error::NewClientIsIncorrect);
+        }
+    } else if client_cell_index_opt.is_some() {
+        debug!("destroy the client cell: no checks");
     } else {
-        return Err(Error::WitnessIsNotExisted);
-    };
-
-    let actual = actual_new_client.pack();
-    debug!("actual packed new client = {}", actual);
-
-    let data = hl::load_cell_data(NEW_CLIENT_INDEX, Source::Output)?;
-    let expected = ClientReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
-    debug!("expected packed new client = {}", expected);
-
-    if actual.as_slice() != expected.as_slice() {
-        return Err(Error::NewClientIsIncorrect);
+        debug!("unknown operation: throw an error");
+        return Err(Error::UnknownOperation);
     }
 
     debug!("{} DONE.", module_path!());
