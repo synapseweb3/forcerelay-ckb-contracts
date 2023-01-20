@@ -18,12 +18,22 @@ use super::{
 use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn test() {
+fn test_case_1() {
+    test(1);
+}
+
+#[test]
+fn test_case_2() {
+    test(2);
+}
+
+fn test(case_id: usize) {
     crate::setup();
 
     let client_id = misc::random_hash().raw_data().to_vec();
 
-    let root_dir = Path::new(DATA_DIR).join("verify_bin");
+    let case_dir = format!("case-{}", case_id);
+    let root_dir = Path::new(DATA_DIR).join("verify_bin").join(case_dir);
     let client = misc::load_data_from_file(&root_dir, "client.data");
     let tx_proof = misc::load_data_from_file(&root_dir, "tx_proof.data");
     let tx_payload = misc::load_data_from_file(&root_dir, "tx_payload.data");

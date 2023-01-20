@@ -16,12 +16,60 @@ use super::{CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR};
 use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn create() {
+fn create_case_1() {
+    let param = CreateParameter {
+        case_id: 1,
+        client_filename: "client.data",
+        proof_update_filename: "old_proof_update.data",
+    };
+    create(param);
+}
+
+#[test]
+fn create_case_2() {
+    let param = CreateParameter {
+        case_id: 2,
+        client_filename: "full_client.data",
+        proof_update_filename: "full_proof_update.data",
+    };
+    create(param);
+}
+
+#[test]
+fn update_case_1() {
+    let param = UpdateParameter {
+        case_id: 1,
+        client_filename: "client.data",
+        new_client_filename: "new_client.data",
+        proof_update_filename: "proof_update.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_2() {
+    let param = UpdateParameter {
+        case_id: 2,
+        client_filename: "client.data",
+        new_client_filename: "full_client.data",
+        proof_update_filename: "proof_update.data",
+    };
+    update(param);
+}
+
+struct CreateParameter {
+    case_id: usize,
+    client_filename: &'static str,
+    proof_update_filename: &'static str,
+}
+
+fn create(param: CreateParameter) {
     crate::setup();
 
-    let root_dir = Path::new(DATA_DIR).join("client_type_lock");
-    let client = misc::load_data_from_file(&root_dir, "client.data");
-    let proof_update = misc::load_data_from_file(&root_dir, "old_proof_update.data");
+    let case_dir = format!("case-{}", param.case_id);
+    let root_dir = Path::new(DATA_DIR).join("client_type_lock").join(case_dir);
+    let client = misc::load_data_from_file(&root_dir, param.client_filename);
+    let proof_update = misc::load_data_from_file(&root_dir, param.proof_update_filename);
 
     let mut context = Context::new();
     let script_version = ScriptVersion::latest();
@@ -81,16 +129,23 @@ fn create() {
     result.should_be_ok();
 }
 
-#[test]
-fn update() {
+struct UpdateParameter {
+    case_id: usize,
+    client_filename: &'static str,
+    new_client_filename: &'static str,
+    proof_update_filename: &'static str,
+}
+
+fn update(param: UpdateParameter) {
     crate::setup();
 
     let client_id = misc::random_hash().raw_data().to_vec();
 
-    let root_dir = Path::new(DATA_DIR).join("client_type_lock");
-    let client = misc::load_data_from_file(&root_dir, "client.data");
-    let new_client = misc::load_data_from_file(&root_dir, "new_client.data");
-    let proof_update = misc::load_data_from_file(&root_dir, "proof_update.data");
+    let case_dir = format!("case-{}", param.case_id);
+    let root_dir = Path::new(DATA_DIR).join("client_type_lock").join(case_dir);
+    let client = misc::load_data_from_file(&root_dir, param.client_filename);
+    let new_client = misc::load_data_from_file(&root_dir, param.new_client_filename);
+    let proof_update = misc::load_data_from_file(&root_dir, param.proof_update_filename);
 
     let mut context = Context::new();
     let script_version = ScriptVersion::latest();

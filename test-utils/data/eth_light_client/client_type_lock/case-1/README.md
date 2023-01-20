@@ -4,12 +4,16 @@
 
 Data are from mainnet.
 
+### Old Proof Update
+
+Slots: 5246120 ~ 5246151
+
 ### Client
 
 Minimal Slot: 5246088
 Maximal Slot: 5246119
 
-### Updates
+### Proof Update
 
 Slots: 5246120 ~ 5246151
 

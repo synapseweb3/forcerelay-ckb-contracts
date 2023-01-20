@@ -13,7 +13,7 @@ default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
 ckb-std = "0.10.0"
-eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/yangby-cryptape/eth-light-client-in-ckb", rev = "76a7e5c" }
+eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/yangby-cryptape/eth-light-client-in-ckb", rev = "779dab1" }
 
 [features]
 default = []
