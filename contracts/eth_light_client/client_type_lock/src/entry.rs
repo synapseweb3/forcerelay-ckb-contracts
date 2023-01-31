@@ -49,6 +49,7 @@ pub fn main() -> Result<()> {
     }
 
     if let Some(new_client_cell_index) = new_client_cell_index_opt {
+        debug!("create or update client cell");
         let witness_args = hl::load_witness_args(new_client_cell_index, Source::Output)?;
         let actual_new_client = if let Some(args) = witness_args.input_type().to_opt() {
             let data = args.raw_data();
@@ -60,6 +61,7 @@ pub fn main() -> Result<()> {
             );
 
             if let Some(client_cell_index) = client_cell_index_opt {
+                debug!("update client cell");
                 let input_data = hl::load_cell_data(client_cell_index, Source::Input)?;
                 let client: Client = {
                     let client =
@@ -69,6 +71,7 @@ pub fn main() -> Result<()> {
                 };
                 client.try_apply_packed_proof_update(proof_update)
             } else {
+                debug!("create client cell");
                 Client::new_from_packed_proof_update(proof_update)
             }?
         } else {

@@ -66,6 +66,8 @@ struct CreateParameter {
 fn create(param: CreateParameter) {
     crate::setup();
 
+    let client_id = misc::random_hash().raw_data().to_vec();
+
     let case_dir = format!("case-{}", param.case_id);
     let root_dir = Path::new(DATA_DIR).join("client_type_lock").join(case_dir);
     let client = misc::load_data_from_file(&root_dir, param.client_filename);
@@ -101,7 +103,18 @@ fn create(param: CreateParameter) {
     };
 
     let transaction = {
-        let output = deployed_cell.cell_output();
+        let output = {
+            let type_script = packed::Script::new_builder()
+                .hash_type(ScriptHashType::Type.into())
+                .code_hash(deployed_type_contract.type_hash().unwrap())
+                .args(client_id.pack())
+                .build();
+            deployed_cell
+                .cell_output()
+                .as_builder()
+                .type_(Some(type_script).pack())
+                .build()
+        };
         let witness = {
             let input_type_args = packed::BytesOpt::new_builder()
                 .set(Some(proof_update.pack()))

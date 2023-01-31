@@ -6,7 +6,7 @@ Data are from mainnet.
 
 ### Old Proof Update
 
-Slots: 5246120 ~ 5246151
+Slots: 5246088 ~ 5246119
 
 ### Client
 
