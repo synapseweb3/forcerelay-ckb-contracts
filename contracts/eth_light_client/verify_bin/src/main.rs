@@ -24,6 +24,6 @@ default_alloc!();
 fn program_entry(argc: u64, argv: *const *const u8) -> i8 {
     match entry::main(argc, argv) {
         Ok(_) => 0,
-        Err(err) => err as i8,
+        Err(err) => err.into(),
     }
 }

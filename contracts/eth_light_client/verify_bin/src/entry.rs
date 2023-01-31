@@ -36,11 +36,10 @@ pub fn main(argc: u64, argv: *const *const u8) -> Result<()> {
     let tx_proof = if let Some(args) = witness_args_reader.input_type().to_opt() {
         let data = args.raw_data();
         if let Ok(reader) = TransactionProofReader::from_slice(data) {
-            if client.verify_packed_transaction_proof(reader).is_ok() {
-                reader.unpack()
-            } else {
-                return Err(Error::FailedToVerifyTransactionProof);
-            }
+            client
+                .verify_packed_transaction_proof(reader)
+                .map_err(Error::FailedToVerifyTransactionProof)?;
+            reader.unpack()
         } else {
             return Err(Error::IncorrectTransactionProof);
         }
@@ -51,9 +50,9 @@ pub fn main(argc: u64, argv: *const *const u8) -> Result<()> {
     if let Some(args) = witness_args_reader.output_type().to_opt() {
         let data = args.raw_data();
         if let Ok(reader) = TransactionPayloadReader::from_slice(data) {
-            if tx_proof.verify_packed_payload(reader).is_err() {
-                return Err(Error::FailedToVerifyTransactionPayload);
-            }
+            tx_proof
+                .verify_packed_payload(reader)
+                .map_err(Error::FailedToVerifyTransactionPayload)?;
         } else {
             return Err(Error::IncorrectTransactionPayload);
         }
