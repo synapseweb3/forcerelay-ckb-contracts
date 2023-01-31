@@ -16,43 +16,97 @@ use super::{CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR};
 use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn create_case_1() {
+fn create_case_1_no_empty() {
     let param = CreateParameter {
         case_id: 1,
-        client_filename: "client.data",
-        proof_update_filename: "old_proof_update.data",
+        client_filename: "client-5246088_5246151.data",
+        proof_update_filename: "proof_update-5246088_5246151.data",
     };
     create(param);
 }
 
 #[test]
-fn create_case_2() {
+#[should_panic]
+fn create_case_2_empty_at_the_start_of_updates() {
     let param = CreateParameter {
         case_id: 2,
-        client_filename: "full_client.data",
-        proof_update_filename: "full_proof_update.data",
+        client_filename: "client-5601248_5601264.data",
+        proof_update_filename: "proof_update-5601248_5601264.data",
     };
     create(param);
 }
 
 #[test]
-fn update_case_1() {
+fn create_case_2_empty_at_the_middle_of_updates() {
+    let param = CreateParameter {
+        case_id: 2,
+        client_filename: "client-5601201_5601264.data",
+        proof_update_filename: "proof_update-5601201_5601264.data",
+    };
+    create(param);
+}
+
+#[test]
+fn create_case_2_empty_at_the_end_of_updates() {
+    let param = CreateParameter {
+        case_id: 2,
+        client_filename: "client-5601201_5601248.data",
+        proof_update_filename: "proof_update-5601201_5601248.data",
+    };
+    create(param);
+}
+
+#[test]
+fn update_case_1_no_empty() {
     let param = UpdateParameter {
         case_id: 1,
-        client_filename: "client.data",
-        new_client_filename: "new_client.data",
-        proof_update_filename: "proof_update.data",
+        client_filename: "client-5246088_5246119.data",
+        new_client_filename: "client-5246088_5246151.data",
+        proof_update_filename: "proof_update-5246120_5246151.data",
     };
     update(param);
 }
 
 #[test]
-fn update_case_2() {
+fn update_case_2_empty_client() {
     let param = UpdateParameter {
         case_id: 2,
-        client_filename: "client.data",
-        new_client_filename: "full_client.data",
-        proof_update_filename: "proof_update.data",
+        client_filename: "client-5601201_5601248.data",
+        new_client_filename: "client-5601201_5601264.data",
+        proof_update_filename: "proof_update-5601249_5601264.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_2_empty_at_the_start_of_updates() {
+    let param = UpdateParameter {
+        case_id: 2,
+        client_filename: "client-5601201_5601247.data",
+        new_client_filename: "client-5601201_5601264.data",
+        proof_update_filename: "proof_update-5601248_5601264.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_2_empty_at_the_middle_of_updates() {
+    let param = UpdateParameter {
+        case_id: 2,
+        client_filename: "client-5601201_5601232.data",
+        new_client_filename: "client-5601201_5601264.data",
+        proof_update_filename: "proof_update-5601233_5601264.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_2_empty_at_the_end_of_updates() {
+    let param = UpdateParameter {
+        case_id: 2,
+        client_filename: "client-5601201_5601224.data",
+        new_client_filename: "client-5601201_5601248.data",
+        proof_update_filename: "proof_update-5601225_5601248.data",
     };
     update(param);
 }
