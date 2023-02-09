@@ -57,6 +57,37 @@ fn create_case_2_empty_at_the_end_of_updates() {
 }
 
 #[test]
+#[should_panic]
+fn create_case_3_continuous_empty_at_the_start_of_updates() {
+    let param = CreateParameter {
+        case_id: 3,
+        client_filename: "client-5654560_5654594.data",
+        proof_update_filename: "proof_update-5654560_5654594.data",
+    };
+    create(param);
+}
+
+#[test]
+fn create_case_3_continuous_empty_at_the_middle_of_updates() {
+    let param = CreateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654594.data",
+        proof_update_filename: "proof_update-5654531_5654594.data",
+    };
+    create(param);
+}
+
+#[test]
+fn create_case_3_continuous_empty_at_the_end_of_updates() {
+    let param = CreateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654561.data",
+        proof_update_filename: "proof_update-5654531_5654561.data",
+    };
+    create(param);
+}
+
+#[test]
 fn update_case_1_no_empty() {
     let param = UpdateParameter {
         case_id: 1,
@@ -107,6 +138,61 @@ fn update_case_2_empty_at_the_end_of_updates() {
         client_filename: "client-5601201_5601224.data",
         new_client_filename: "client-5601201_5601248.data",
         proof_update_filename: "proof_update-5601225_5601248.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_3_continuous_empty_client() {
+    let param = UpdateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654561.data",
+        new_client_filename: "client-5654531_5654594.data",
+        proof_update_filename: "proof_update-5654562_5654594.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_3_continuous_empty_at_the_start_of_updates() {
+    let param = UpdateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654559.data",
+        new_client_filename: "client-5654531_5654594.data",
+        proof_update_filename: "proof_update-5654560_5654594.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_3_continuous_empty_at_the_middle_of_updates() {
+    let param = UpdateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654562.data",
+        new_client_filename: "client-5654531_5654594.data",
+        proof_update_filename: "proof_update-5654563_5654594.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_3_continuous_empty_at_the_middle_of_updates_and_split() {
+    let param = UpdateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654560.data",
+        new_client_filename: "client-5654531_5654594.data",
+        proof_update_filename: "proof_update-5654561_5654594.data",
+    };
+    update(param);
+}
+
+#[test]
+fn update_case_3_continuous_empty_at_the_end_of_updates() {
+    let param = UpdateParameter {
+        case_id: 3,
+        client_filename: "client-5654531_5654545.data",
+        new_client_filename: "client-5654531_5654561.data",
+        proof_update_filename: "proof_update-5654546_5654561.data",
     };
     update(param);
 }
