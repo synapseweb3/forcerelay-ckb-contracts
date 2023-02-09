@@ -178,7 +178,7 @@ checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
 [[package]]
 name = "eth2_hashing"
 version = "0.3.0"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "sha2",
 ]
@@ -186,7 +186,7 @@ dependencies = [
 [[package]]
 name = "eth2_serde_utils"
 version = "0.1.1"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "ethereum-types",
  "hex",
@@ -198,7 +198,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz"
 version = "0.4.1"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "ethereum-types",
  "itertools",
@@ -208,7 +208,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz_derive"
 version = "0.3.0"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -219,7 +219,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz_types"
 version = "0.2.2"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "derivative",
  "eth2_serde_utils",
@@ -234,7 +234,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.1.0-alpha.0"
-source = "git+https://github.com/yangby-cryptape/eth-light-client-in-ckb?rev=ef4a738#ef4a7386ddc96185e4b41eba44a882398146b8b2"
+source = "git+https://github.com/yangby-cryptape/eth-light-client-in-ckb?rev=5ba3e1e#5ba3e1ed87f1b378b8b4c5cfc96203d8f337d4ab"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -251,9 +251,9 @@ dependencies = [
 
 [[package]]
 name = "ethbloom"
-version = "0.11.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfb684ac8fa8f6c5759f788862bb22ec6fe3cb392f6bfd08e3c64b603661e3f8"
+checksum = "c22d4b5885b6aa2fe5e8b9329fb8d232bf739e434e6b87347c63bdd00c120f60"
 dependencies = [
  "crunchy",
  "fixed-hash",
@@ -264,9 +264,9 @@ dependencies = [
 
 [[package]]
 name = "ethereum-types"
-version = "0.12.1"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05136f7057fe789f06e6d41d07b34e6f70d8c86e5693b60f97aaa6553553bdaf"
+checksum = "02d215cbf040552efcbe99a38372fe80ab9d00268e20012b79fcd0f073edd8ee"
 dependencies = [
  "ethbloom",
  "fixed-hash",
@@ -278,9 +278,9 @@ dependencies = [
 
 [[package]]
 name = "fixed-hash"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfcf0ed7fe52a17a03854ec54a9f76d6d84508d1c0e66bc1793301c73fc8493c"
+checksum = "835c052cb0c08c1acf6ffd71c022172e18723949c8282f2b9f27efbc51e64534"
 dependencies = [
  "byteorder",
  "rustc-hex",
@@ -334,9 +334,9 @@ dependencies = [
 
 [[package]]
 name = "impl-serde"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4551f042f3438e64dbd6226b20527fc84a6e1fe65688b58746a2f53623f25f5c"
+checksum = "ebc88fc67028ae3db0c853baa36269d398d5f45b6982f95549ff5def78c935cd"
 dependencies = [
  "serde",
 ]
@@ -371,7 +371,7 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 [[package]]
 name = "merkle_proof"
 version = "0.2.0"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -389,9 +389,9 @@ dependencies = [
 
 [[package]]
 name = "primitive-types"
-version = "0.10.1"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05e4722c697a58a99d5d06a08c30821d7c082a4632198de1eaa5a6c22ef42373"
+checksum = "9f3486ccba82358b11a77516035647c34ba167dfa53312630de83b12bd4f3d66"
 dependencies = [
  "fixed-hash",
  "impl-rlp",
@@ -442,7 +442,7 @@ checksum = "7b4b9743ed687d4b4bcedf9ff5eaa7398495ae14e61cba0a295704edbc7decde"
 [[package]]
 name = "safe_arith"
 version = "0.1.0"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 
 [[package]]
 name = "serde"
@@ -527,7 +527,7 @@ dependencies = [
 [[package]]
 name = "tree_hash"
 version = "0.4.1"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -537,7 +537,7 @@ dependencies = [
 [[package]]
 name = "tree_hash_derive"
 version = "0.4.0"
-source = "git+https://github.com/yangby-cryptape/lighthouse?rev=62dc610#62dc610037abf9b7cb08fc9c9bb05528ebedf9cf"
+source = "git+https://github.com/yangby-cryptape/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
 dependencies = [
  "darling",
  "quote",
