@@ -11,7 +11,7 @@ env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
   RUST_BACKTRACE: full
-  RUST_TOOLCHAIN: 1.66.0
+  RUST_TOOLCHAIN: 1.67.0
 jobs:
   #
   # Contracts
@@ -22,7 +22,8 @@ jobs:
     container:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Run the Checker
         run: make format-all-contracts
   lint-contracts:
@@ -31,7 +32,8 @@ jobs:
     container:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Run the Checker
         run: make lint-all-contracts
   build-contracts:
@@ -43,12 +45,14 @@ jobs:
     env:
       CARGO_BUILD_ARGS: --features debugging
     steps:
-      - uses: actions/checkout@v2
-      - name: Build
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
+      - name: Build Contracts in Debug Mode
         run: make all-contracts
-      - uses: actions/upload-artifact@v3
+      - name: Upload Contracts
+        uses: actions/upload-artifact@v3
         with:
-          name: all-contracts
+          name: all-contracts-in-debug-mode
           path: build
   #
   # Test Utils
@@ -57,34 +61,28 @@ jobs:
     name: Checks / Format (test-utils)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
           rustup default ${{ env.RUST_TOOLCHAIN }}
           rustup component add rustfmt
       - name: Run the Checker
-        run: |
-          cd test-utils
-          cargo fmt --all -- --check
+        run: make format-test-utils
   lint-test-utils:
     name: Checks / Lint (test-utils)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
           rustup default ${{ env.RUST_TOOLCHAIN }}
           rustup component add clippy
       - name: Run the Checker
-        run: |
-          cd test-utils
-          cargo clippy -- --deny warnings
+        run: make lint-test-utils
   #
   # Run Tests
   #
@@ -93,18 +91,16 @@ jobs:
     needs: [ build-contracts, format-test-utils, lint-test-utils ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
           rustup default ${{ env.RUST_TOOLCHAIN }}
-      - uses: actions/download-artifact@v3
+      - name: Download Contracts
+        uses: actions/download-artifact@v3
         with:
-          name: all-contracts
+          name: all-contracts-in-debug-mode
           path: build
       - name: Run the Tests
-        run: |
-          cd test-utils
-          cargo test --no-fail-fast -- --nocapture --test-threads 1
+        run: make test

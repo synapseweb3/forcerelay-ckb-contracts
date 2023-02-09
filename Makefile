@@ -79,6 +79,25 @@ ${OUTPUT_DIR}/%:
 			bash -c "make \"$${contract_name}\" && chown -v \"$${owner_and_group}\" \"${OUTPUT_DIR}/$${contract_name}\""
 
 #
+# Targets for Test Utilities
+#
+
+format-test-utils:
+	@set -eu; \
+		cd test-utils; \
+		cargo fmt --all -- --check
+
+lint-test-utils:
+	@set -eu; \
+		cd test-utils; \
+		cargo clippy -- --deny warnings
+
+test:
+	@set -eu; \
+		cd test-utils; \
+		cargo test --no-fail-fast -- --nocapture --test-threads 1
+
+#
 # Targets to Build Contracts
 #
 
