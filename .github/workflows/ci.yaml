@@ -23,7 +23,7 @@ jobs:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run the Checker
         run: make format-all-contracts
   lint-contracts:
@@ -33,7 +33,7 @@ jobs:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run the Checker
         run: make lint-all-contracts
   build-contracts:
@@ -46,7 +46,7 @@ jobs:
       CARGO_BUILD_ARGS: --features debugging
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build Contracts in Debug Mode
         run: make all-contracts
       - name: Upload Contracts
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set Rust Toolchain
         run: |
           rustup toolchain install --profile minimal ${{ env.RUST_TOOLCHAIN }}
