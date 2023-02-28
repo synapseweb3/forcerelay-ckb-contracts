@@ -5,8 +5,8 @@ authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
 description = "Utilities for testing IBC CKB contracts."
-homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
-repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
+repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-script    = "0.107.0"

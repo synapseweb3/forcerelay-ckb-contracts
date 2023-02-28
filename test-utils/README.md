@@ -5,4 +5,4 @@ Utilities for testing [CKB] contracts.
 This is a part of [IBC CKB Contracts].
 
 [CKB]: https://github.com/nervosnetwork/ckb
-[IBC CKB Contracts]: https://github.com/yangby-cryptape/ibc-ckb-contracts
+[IBC CKB Contracts]: https://github.com/synapseweb3/ibc-ckb-contracts

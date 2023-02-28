@@ -1,14 +1,14 @@
 # IBC CKB Contracts
 
 [![License]](#license)
-[![GitHub Actions]](https://github.com/yangby-cryptape/ibc-ckb-contracts/actions)
+[![GitHub Actions]](https://github.com/synapseweb3/ibc-ckb-contracts/actions)
 
 > :warning: **WARNING** This repository is still in the proof-of-concept stage.
 
 [IBC] implementations in [CKB] contracts.
 
 [License]: https://img.shields.io/badge/License-MIT-blue.svg
-[GitHub Actions]: https://github.com/yangby-cryptape/ibc-ckb-contracts//workflows/CI/badge.svg
+[GitHub Actions]: https://github.com/synapseweb3/ibc-ckb-contracts//workflows/CI/badge.svg
 
 ## Contracts
 
