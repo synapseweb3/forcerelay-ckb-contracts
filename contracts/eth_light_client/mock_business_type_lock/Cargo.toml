@@ -7,13 +7,13 @@ authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
 description = "An IBC implementation of ETH light client in CKB contract (testing part)."
-homepage = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
-repository = "https://github.com/yangby-cryptape/ibc-ckb-contracts"
+homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
+repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
 ckb-std = "0.10.0"
-eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/yangby-cryptape/eth-light-client-in-ckb", rev = "5ba3e1e" }
+eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "e94ec1a" }
 
 [features]
 default = []
