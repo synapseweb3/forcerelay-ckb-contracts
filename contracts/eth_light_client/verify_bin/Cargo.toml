@@ -12,8 +12,8 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
-ckb-std = "0.10.0"
-eth_light_client_in_ckb-verification = { version = "0.1.0", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", tag = "v0.1.0" }
+ckb-std = "0.12.1"
+eth_light_client_in_ckb-verification = { version = "0.2.0-alpha", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "8f20fc6" }
 
 [features]
 default = []

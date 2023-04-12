@@ -1,4 +1,4 @@
-use ckb_std::{ckb_constants::Source, cstr_core::CStr, error::SysError, high_level as hl};
+use ckb_std::{ckb_constants::Source, env, error::SysError, high_level as hl};
 use eth_light_client_in_ckb_verification::types::{
     core::Client,
     packed::{ClientReader, TransactionPayloadReader, TransactionProofReader},
@@ -7,13 +7,15 @@ use eth_light_client_in_ckb_verification::types::{
 
 use crate::error::{Error, Result};
 
-const CLIENT_ARG_INDEX: isize = 0;
-const WITNESS_ARG_INDEX: isize = 1;
+const CLIENT_ARG_INDEX: usize = 0;
+const WITNESS_ARG_INDEX: usize = 1;
 
-pub fn main(argc: u64, argv: *const *const u8) -> Result<()> {
+pub fn main() -> Result<()> {
     debug!("{} Starting ...", module_path!());
 
-    if argc != 2 {
+    let argv = env::argv();
+
+    if argv.len() != 2 {
         return Err(Error::IncorrectArgc);
     }
 
@@ -65,25 +67,14 @@ pub fn main(argc: u64, argv: *const *const u8) -> Result<()> {
     Ok(())
 }
 
-fn load_usize_from_argv(argv: *const *const u8, index: isize) -> Result<usize> {
-    let argv_ptr = unsafe { argv.offset(index) };
-    let value: usize = if let Some(arg_ptr) = unsafe { argv_ptr.as_ref() } {
-        if let Some(arg_ptr) = unsafe { arg_ptr.as_ref() } {
-            let arg_cstr = unsafe { CStr::from_ptr(arg_ptr) };
-            if let Ok(arg_str) = arg_cstr.to_str() {
-                if let Ok(index) = arg_str.parse() {
-                    index
-                } else {
-                    return Err(Error::IncorrectArgv);
-                }
-            } else {
-                return Err(Error::IncorrectArgv);
-            }
+fn load_usize_from_argv(argv: &[env::Arg], index: usize) -> Result<usize> {
+    if let Ok(arg_str) = argv[index].to_str() {
+        if let Ok(value) = arg_str.parse() {
+            Ok(value)
         } else {
-            return Err(Error::IncorrectArgv);
+            Err(Error::IncorrectArgv)
         }
     } else {
-        return Err(Error::IncorrectArgv);
-    };
-    Ok(value)
+        Err(Error::IncorrectArgv)
+    }
 }

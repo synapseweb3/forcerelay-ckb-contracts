@@ -1,6 +1,7 @@
+use alloc::ffi::NulError;
 use core::result;
 
-use ckb_std::{cstr_core::NulError, error::SysError};
+use ckb_std::error::SysError;
 
 pub type Result<T> = result::Result<T, Error>;
 

@@ -12,7 +12,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
-ckb-std = "0.10.0"
+ckb-std = "0.12.1"
 
 [features]
 default = []

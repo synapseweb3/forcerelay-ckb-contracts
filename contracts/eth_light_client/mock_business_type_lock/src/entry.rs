@@ -1,9 +1,8 @@
-use alloc::string::ToString as _;
+use alloc::{ffi::CString, string::ToString as _};
 
 use ckb_std::{
     ckb_constants::Source,
     ckb_types::{core::ScriptHashType, packed::Byte32Reader},
-    cstr_core::CString,
     high_level as hl,
 };
 use eth_light_client_in_ckb_verification::types::prelude::*;

@@ -13,9 +13,9 @@ dependencies = [
 
 [[package]]
 name = "buddy-alloc"
-version = "0.4.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ff9f338986406db85e2b5deb40a9255b796ca03a194c7457403d215173f3fd5"
+checksum = "c6aa666383df80e31d5e162998ed05880695bb377f2a98210978e586f006aaec"
 
 [[package]]
 name = "byteorder"
@@ -62,14 +62,13 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.10.0"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47a6ad40455c446ad6fbb303dae24827fc309f43558f59d1f1b863a9de3e9f81"
+checksum = "8dbb4cafeca131457738f8428ef31a7729f7914b99b5c210554433f03eb2f936"
 dependencies = [
  "buddy-alloc",
  "cc",
  "ckb-standalone-types",
- "cstr_core",
 ]
 
 [[package]]
@@ -96,22 +95,6 @@ dependencies = [
  "generic-array",
  "typenum",
 ]
-
-[[package]]
-name = "cstr_core"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
-dependencies = [
- "cty",
- "memchr",
-]
-
-[[package]]
-name = "cty"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b365fabc795046672053e29c954733ec3b05e4be654ab130fe8f1f94d7051f35"
 
 [[package]]
 name = "darling"
@@ -233,8 +216,8 @@ dependencies = [
 
 [[package]]
 name = "eth_light_client_in_ckb-verification"
-version = "0.1.0"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.1.0#602c1b3d56868c96ccde74293cb7ff51025a158a"
+version = "0.2.0-alpha"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=8f20fc6#8f20fc616221877971d80050c3db3deb5fcf42a8"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -363,12 +346,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "db6d7e329c562c5dfab7a46a2afabc8b987ab9a4834c9d1ca04dc54c1546cef8"
 
 [[package]]
-name = "memchr"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
-
-[[package]]
 name = "merkle_proof"
 version = "0.2.0"
 source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
@@ -380,9 +357,9 @@ dependencies = [
 
 [[package]]
 name = "molecule"
-version = "0.7.3"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edc8276c02a006bddad7d1c28c1a88f30421e1b5f0ba0ca96ceb8077c7d20c01"
+checksum = "d4fd9767ab5e5f2ea40f71ff4c8bdb633c50509052e093c2fdd0e390a749dfa3"
 dependencies = [
  "cfg-if",
 ]
