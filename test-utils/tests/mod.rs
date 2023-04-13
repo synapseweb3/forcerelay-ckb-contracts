@@ -22,6 +22,7 @@ pub(crate) mod prelude {
 
     pub(crate) trait IsVerifyResult {
         fn should_be_ok(&self);
+        fn should_be_err(&self);
     }
 
     impl IsVerifyResult for Result<Cycle, Error> {
@@ -32,6 +33,17 @@ pub(crate) mod prelude {
                 }
                 Err(reason) => {
                     panic!("Failed since: {}", reason);
+                }
+            }
+        }
+
+        fn should_be_err(&self) {
+            match self {
+                Ok(cycles) => {
+                    panic!("Cost: {} cycles", cycles);
+                }
+                Err(reason) => {
+                    println!("Failed since: {}", reason);
                 }
             }
         }

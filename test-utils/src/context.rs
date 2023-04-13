@@ -41,15 +41,28 @@ impl Context {
         data: Bytes,
         lock_script: packed::Script,
         type_script_opt: Option<packed::Script>,
+        extra_capacity_opt: Option<Capacity>,
     ) -> DeployedCell {
         let data_hash = packed::CellOutput::calc_data_hash(&data);
         let type_hash_opt = type_script_opt.as_ref().map(|s| s.calc_script_hash());
         let data_capacity = Capacity::bytes(data.len()).unwrap();
-        let cell_output = packed::CellOutput::new_builder()
-            .lock(lock_script)
-            .type_(type_script_opt.pack())
-            .build_exact_capacity(data_capacity)
-            .unwrap();
+        let cell_output = {
+            let cell_output = packed::CellOutput::new_builder()
+                .lock(lock_script)
+                .type_(type_script_opt.pack())
+                .build_exact_capacity(data_capacity)
+                .unwrap();
+            if let Some(extra_capacity) = extra_capacity_opt {
+                let exact_capacity: Capacity = cell_output.capacity().unpack();
+                let total_capacity = exact_capacity.safe_add(extra_capacity).unwrap();
+                cell_output
+                    .as_builder()
+                    .capacity(total_capacity.pack())
+                    .build()
+            } else {
+                cell_output
+            }
+        };
         let out_point = misc::random_out_point();
 
         self.cells

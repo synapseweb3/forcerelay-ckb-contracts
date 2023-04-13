@@ -1,7 +1,7 @@
 cargo-features = ["per-package-target"]
 
 [package]
-name = "ibc-ckb_contracts-mock_contracts-reverse_args_lock"
+name = "ibc-ckb_contracts-mock_contracts-can_update_without_ownership_lock"
 version = "0.1.0-alpha.0"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"

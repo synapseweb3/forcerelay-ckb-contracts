@@ -13,7 +13,7 @@ use ibc_ckb_contracts_test_utils::{
 };
 
 use super::{CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR};
-use crate::{mock_contracts::REVERSE_ARGS_LOCK_CONTRACT, prelude::*};
+use crate::{mock_contracts::CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT, prelude::*};
 
 #[test]
 fn create_case_1_no_empty() {
@@ -217,10 +217,11 @@ fn create(param: CreateParameter) {
     let script_version = ScriptVersion::latest();
 
     let deployed_lock_contract = {
-        let contract_data = misc::load_contract_from_file(REVERSE_ARGS_LOCK_CONTRACT);
+        let contract_data =
+            misc::load_contract_from_file(CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT);
         let data = contract_data.into();
         let lock_script = packed::Script::default();
-        context.deploy(data, lock_script, None)
+        context.deploy(data, lock_script, None, None)
     };
 
     let deployed_type_contract = {
@@ -228,7 +229,7 @@ fn create(param: CreateParameter) {
         let data = contract_data.into();
         let lock_script = packed::Script::default();
         let type_script = packed::Script::new_builder().args(vec![0u8].pack()).build();
-        context.deploy(data, lock_script, Some(type_script))
+        context.deploy(data, lock_script, Some(type_script), None)
     };
 
     let deployed_cell = {
@@ -239,7 +240,7 @@ fn create(param: CreateParameter) {
             .code_hash(deployed_lock_contract.data_hash())
             .args(args.pack())
             .build();
-        context.deploy(data, lock_script, None)
+        context.deploy(data, lock_script, None, None)
     };
 
     let transaction = {
@@ -304,10 +305,11 @@ fn update(param: UpdateParameter) {
     let script_version = ScriptVersion::latest();
 
     let deployed_lock_contract = {
-        let contract_data = misc::load_contract_from_file(REVERSE_ARGS_LOCK_CONTRACT);
+        let contract_data =
+            misc::load_contract_from_file(CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT);
         let data = contract_data.into();
         let lock_script = packed::Script::default();
-        context.deploy(data, lock_script, None)
+        context.deploy(data, lock_script, None, None)
     };
 
     let deployed_type_contract = {
@@ -315,7 +317,7 @@ fn update(param: UpdateParameter) {
         let data = contract_data.into();
         let lock_script = packed::Script::default();
         let type_script = packed::Script::new_builder().args(vec![0u8].pack()).build();
-        context.deploy(data, lock_script, Some(type_script))
+        context.deploy(data, lock_script, Some(type_script), None)
     };
 
     let deployed_cell = {
@@ -331,7 +333,7 @@ fn update(param: UpdateParameter) {
             .code_hash(deployed_type_contract.type_hash().unwrap())
             .args(client_id.pack())
             .build();
-        context.deploy(data, lock_script, Some(type_script))
+        context.deploy(data, lock_script, Some(type_script), None)
     };
 
     let transaction = {

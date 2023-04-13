@@ -14,7 +14,7 @@
 
 ### Mock Contracts
 
-- [Reverse Args Lock](contracts/mock_contracts/reverse_args_lock)
+- ["Can Update Without Ownership" Lock](contracts/mock_contracts/can_update_without_ownership_lock)
 
 ### ETH Light Client
 

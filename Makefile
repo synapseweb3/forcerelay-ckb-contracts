@@ -10,7 +10,7 @@ CONTRACTS_DIR := contracts
 OUTPUT_DIR := build
 
 ALL_CONTRACTS := \
-    mock_contracts-reverse_args_lock \
+    mock_contracts-can_update_without_ownership_lock \
     eth_light_client-client_type_lock \
     eth_light_client-verify_bin \
     eth_light_client-mock_business_type_lock
@@ -101,8 +101,8 @@ test:
 # Targets to Build Contracts
 #
 
-.PHONY: mock_contracts-reverse_args_lock
-mock_contracts-reverse_args_lock: ${OUTPUT_DIR}/mock_contracts-reverse_args_lock
+.PHONY: mock_contracts-can_update_without_ownership_lock
+mock_contracts-can_update_without_ownership_lock: ${OUTPUT_DIR}/mock_contracts-can_update_without_ownership_lock
 
 .PHONY: eth_light_client-client_type_lock
 eth_light_client-client_type_lock: ${OUTPUT_DIR}/eth_light_client-client_type_lock
