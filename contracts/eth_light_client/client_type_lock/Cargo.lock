@@ -178,7 +178,7 @@ checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
 [[package]]
 name = "eth2_hashing"
 version = "0.3.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "sha2",
 ]
@@ -186,7 +186,7 @@ dependencies = [
 [[package]]
 name = "eth2_serde_utils"
 version = "0.1.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "ethereum-types",
  "hex",
@@ -198,7 +198,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz"
 version = "0.4.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "ethereum-types",
  "itertools",
@@ -207,8 +207,8 @@ dependencies = [
 
 [[package]]
 name = "eth2_ssz_derive"
-version = "0.3.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+version = "0.3.1"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -219,7 +219,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz_types"
 version = "0.2.2"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "derivative",
  "eth2_serde_utils",
@@ -234,7 +234,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.1.0#602c1b3d56868c96ccde74293cb7ff51025a158a"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=054d9ae#054d9aeb8c7c405deb10db53ccf28bb78296a31f"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -371,7 +371,7 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 [[package]]
 name = "merkle_proof"
 version = "0.2.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -442,7 +442,7 @@ checksum = "7b4b9743ed687d4b4bcedf9ff5eaa7398495ae14e61cba0a295704edbc7decde"
 [[package]]
 name = "safe_arith"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 
 [[package]]
 name = "serde"
@@ -527,7 +527,7 @@ dependencies = [
 [[package]]
 name = "tree_hash"
 version = "0.4.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -537,7 +537,7 @@ dependencies = [
 [[package]]
 name = "tree_hash_derive"
 version = "0.4.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=307ade9#307ade97f19792c6ee6b93fdfaa392c3d38ea110"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
 dependencies = [
  "darling",
  "quote",
