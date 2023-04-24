@@ -27,6 +27,21 @@ fn test_case_2() {
     test(2);
 }
 
+#[test]
+fn test_case_3() {
+    test(3);
+}
+
+#[test]
+fn test_case_4() {
+    test(4);
+}
+
+#[test]
+fn test_case_5() {
+    test(5);
+}
+
 fn test(case_id: usize) {
     crate::setup();
 
