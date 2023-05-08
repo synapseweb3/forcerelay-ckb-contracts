@@ -59,17 +59,13 @@ pub fn main() -> Result<()> {
 
     let witness_index_string = CString::new(WITNESS_INDEX.to_string())?;
 
-    let retcode = hl::exec_cell(
+    hl::exec_cell(
         bin_cell_type_hash.as_slice(),
         ScriptHashType::Type,
         0,
         0,
         &[&client_cell_index_string, &witness_index_string],
     )?;
-
-    if retcode != 0 {
-        return Err(Error::FailedToExecuteBinCell);
-    }
 
     debug!("{} DONE.", module_path!());
 

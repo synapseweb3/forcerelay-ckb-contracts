@@ -16,7 +16,6 @@ pub enum Error {
     IncorrectArgs,
     ClientCellDepIsNotExisted,
     BinCellDepIsNotExisted,
-    FailedToExecuteBinCell,
 }
 
 impl From<SysError> for Error {

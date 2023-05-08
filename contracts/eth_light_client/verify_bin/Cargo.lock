@@ -62,9 +62,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8dbb4cafeca131457738f8428ef31a7729f7914b99b5c210554433f03eb2f936"
+checksum = "9f54eab6dca547f2123a6d84c64da2414e5532263568e81899b9806ba21d7c8f"
 dependencies = [
  "buddy-alloc",
  "cc",
@@ -217,7 +217,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.2.0-alpha"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=9b409ed#9b409ed7cfd3e3aed60bfc7b0b6bcf03627658c7"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=388bfd4#388bfd4b691279ffee0e8f2b77626e62f2cbd207"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",

@@ -68,7 +68,6 @@ pub fn main() -> Result<()> {
         debug!("calculating outputs capacity ...");
         let total_outputs_capacity = hl::QueryIter::new(hl::load_cell_lock_hash, Source::Output)
             .enumerate()
-            .into_iter()
             .try_fold(0u64, |total, (index, lock_hash)| {
                 if lock_hash == script_hash {
                     debug!(">>> checking output {index}");
