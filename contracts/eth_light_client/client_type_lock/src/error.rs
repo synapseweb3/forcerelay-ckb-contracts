@@ -13,14 +13,39 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
-    // 0x10 ~ 0x2f: Errors in current crate.
-    NewClientIsIncorrect,
-    ClientShouldBeUniqueInInputs,
-    ClientShouldBeUniqueInOutputs,
+    // 0x10 ~ 0x4f: Errors in current crate.
     UnknownOperation,
-    WitnessIsNotExisted,
+    OnlyOneInputWithCurrentType,
 
-    // 0x30 ~ 0x3f: Errors when apply proof update.
+    CreateNotEnoughCells,
+    CreateShouldBeOrdered,
+    CreateCellsCountNotMatched,
+    CreateIncorrectUniqueId,
+    CreateBadClientInfoCellData,
+    CreateClientInfoIndexShouldBeZero,
+    CreateClientInfoMinimalUpdatesCountShouldNotBeZero,
+    CreateBadClientCellData,
+    CreateUpdatesIsNotEnough,
+    CreateWitnessIsNotExisted,
+    CreateNewClientIsIncorrect,
+
+    UpdateInputClientInfoCellNotFound,
+    UpdateInputClientCellNotFound,
+    UpdateOutputClientInfoCellNotFound,
+    UpdateOutputClientCellNotFound,
+    UpdateClientInfoMinimalUpdatesCountChanged,
+    UpdateClientInfoNewLastIdIsIncorrect,
+    UpdateClientInputLastIdIsIncorrect,
+    UpdateCellDepLastIdIsIncorrect,
+    UpdateMoreThanOneCellDepsWithCurrentType,
+    UpdateCellDepClientCellNotFound,
+    UpdateUpdatesIsNotEnough,
+    UpdateWitnessIsNotExisted,
+    UpdateNewClientIsIncorrect,
+
+    DestroyNotEnoughCells,
+
+    // 0x50 ~ 0x7f: Errors when apply proof update.
     ProofUpdate(ProofUpdateError),
 }
 
@@ -52,13 +77,38 @@ impl From<Error> for i8 {
             Error::Encoding => 0x04,
             Error::UnknownSysError => 0x0f,
 
-            Error::NewClientIsIncorrect => 0x10,
-            Error::ClientShouldBeUniqueInInputs => 0x11,
-            Error::ClientShouldBeUniqueInOutputs => 0x12,
-            Error::UnknownOperation => 0x13,
-            Error::WitnessIsNotExisted => 0x14,
+            Error::UnknownOperation => 0x10,
+            Error::OnlyOneInputWithCurrentType => 0x11,
 
-            Error::ProofUpdate(e) => 0x30 + e as i8,
+            Error::CreateNotEnoughCells => 0x20,
+            Error::CreateShouldBeOrdered => 0x21,
+            Error::CreateCellsCountNotMatched => 0x22,
+            Error::CreateIncorrectUniqueId => 0x23,
+            Error::CreateBadClientInfoCellData => 0x24,
+            Error::CreateClientInfoIndexShouldBeZero => 0x25,
+            Error::CreateClientInfoMinimalUpdatesCountShouldNotBeZero => 0x26,
+            Error::CreateBadClientCellData => 0x27,
+            Error::CreateUpdatesIsNotEnough => 0x2d,
+            Error::CreateWitnessIsNotExisted => 0x2e,
+            Error::CreateNewClientIsIncorrect => 0x2f,
+
+            Error::UpdateInputClientInfoCellNotFound => 0x30,
+            Error::UpdateInputClientCellNotFound => 0x31,
+            Error::UpdateOutputClientInfoCellNotFound => 0x32,
+            Error::UpdateOutputClientCellNotFound => 0x33,
+            Error::UpdateClientInfoMinimalUpdatesCountChanged => 0x34,
+            Error::UpdateClientInfoNewLastIdIsIncorrect => 0x35,
+            Error::UpdateClientInputLastIdIsIncorrect => 0x36,
+            Error::UpdateCellDepLastIdIsIncorrect => 0x37,
+            Error::UpdateMoreThanOneCellDepsWithCurrentType => 0x38,
+            Error::UpdateCellDepClientCellNotFound => 0x39,
+            Error::UpdateUpdatesIsNotEnough => 0x3d,
+            Error::UpdateWitnessIsNotExisted => 0x3e,
+            Error::UpdateNewClientIsIncorrect => 0x3f,
+
+            Error::DestroyNotEnoughCells => 0x40,
+
+            Error::ProofUpdate(e) => 0x50 + e as i8,
         }
     }
 }

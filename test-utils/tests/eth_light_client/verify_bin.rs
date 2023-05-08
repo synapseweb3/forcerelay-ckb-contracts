@@ -13,45 +13,39 @@ use ibc_ckb_contracts_test_utils::{
 };
 
 use super::{
-    CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR, MOCK_BUSINESS_TYPE_LOCK_CONTRACT, VERIFY_BIN_CONTRACT,
+    utils, CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR, MOCK_BUSINESS_TYPE_LOCK_CONTRACT,
+    VERIFY_BIN_CONTRACT,
 };
 use crate::{mock_contracts::CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn test_case_1() {
-    test(1);
+fn verify_case_1() {
+    let param = VerifyParameter {
+        case_id: 1,
+        client_filename: "client-6268480_6268543.data",
+        tx_proof_filename: "tx_proof-6268512_17091977_42.data",
+        tx_payload_filename: "tx_payload-6268512_17091977_42.data",
+    };
+    verify(param);
 }
 
-#[test]
-fn test_case_2() {
-    test(2);
+struct VerifyParameter {
+    case_id: usize,
+    client_filename: &'static str,
+    tx_proof_filename: &'static str,
+    tx_payload_filename: &'static str,
 }
 
-#[test]
-fn test_case_3() {
-    test(3);
-}
-
-#[test]
-fn test_case_4() {
-    test(4);
-}
-
-#[test]
-fn test_case_5() {
-    test(5);
-}
-
-fn test(case_id: usize) {
+fn verify(param: VerifyParameter) {
     crate::setup();
 
-    let client_id = misc::random_hash().raw_data().to_vec();
+    let clients_count = 10;
 
-    let case_dir = format!("case-{}", case_id);
+    let case_dir = format!("case-{}", param.case_id);
     let root_dir = Path::new(DATA_DIR).join("verify_bin").join(case_dir);
-    let client = misc::load_data_from_file(&root_dir, "client.data");
-    let tx_proof = misc::load_data_from_file(&root_dir, "tx_proof.data");
-    let tx_payload = misc::load_data_from_file(&root_dir, "tx_payload.data");
+    let client = misc::load_data_from_file(&root_dir, param.client_filename);
+    let tx_proof = misc::load_data_from_file(&root_dir, param.tx_proof_filename);
+    let tx_payload = misc::load_data_from_file(&root_dir, param.tx_payload_filename);
 
     let mut context = Context::new();
     let script_version = ScriptVersion::latest();
@@ -75,17 +69,24 @@ fn test(case_id: usize) {
 
         {
             let data = client.into();
-            let args = misc::random_bytes();
+
+            let lock_args = misc::randomize_bytes();
             let lock_script = packed::Script::new_builder()
                 .hash_type(script_version.data_hash_type().into())
                 .code_hash(deployed_lock_contract.data_hash())
-                .args(args.pack())
+                .args(lock_args.pack())
                 .build();
+
+            let client_type_args = {
+                let cells_count = clients_count + 1;
+                utils::randomize_client_type_args(cells_count)
+            };
             let type_script = packed::Script::new_builder()
                 .hash_type(ScriptHashType::Type.into())
                 .code_hash(deployed_type_contract.type_hash().unwrap())
-                .args(client_id.pack())
+                .args(client_type_args)
                 .build();
+
             context.deploy(data, lock_script, Some(type_script), None)
         }
     };
@@ -107,7 +108,7 @@ fn test(case_id: usize) {
 
     let deployed_cell = {
         let data = vec![0u8].into();
-        let lock_args = misc::random_bytes();
+        let lock_args = misc::randomize_bytes();
         let lock_script = packed::Script::new_builder()
             .hash_type(script_version.data_hash_type().into())
             .code_hash(deployed_lock_contract.data_hash())

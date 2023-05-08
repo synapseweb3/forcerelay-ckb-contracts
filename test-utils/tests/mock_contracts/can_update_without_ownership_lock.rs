@@ -17,7 +17,7 @@ use crate::prelude::*;
 fn lost_capacity_with_1_input() {
     crate::setup();
 
-    let args_bytes = misc::random_bytes();
+    let args_bytes = misc::randomize_bytes();
     let args: packed::Bytes = args_bytes.pack();
     let args_rev: packed::Bytes = args_bytes.into_iter().rev().collect::<Vec<_>>().pack();
 
@@ -69,9 +69,9 @@ fn lost_capacity_with_1_input() {
     .pack();
 
     let witness_bad_args = {
-        let mut args_bad: packed::Bytes = misc::random_bytes().pack();
+        let mut args_bad: packed::Bytes = misc::randomize_bytes().pack();
         while args_rev.as_slice() == args_bad.as_slice() {
-            args_bad = misc::random_bytes().pack();
+            args_bad = misc::randomize_bytes().pack();
         }
 
         let lock_args = packed::BytesOpt::new_builder().set(Some(args_bad)).build();
@@ -129,7 +129,7 @@ fn lost_capacity_with_1_input() {
 fn lost_capacity_with_2_inputs() {
     crate::setup();
 
-    let args_bytes = misc::random_bytes();
+    let args_bytes = misc::randomize_bytes();
     let args: packed::Bytes = args_bytes.pack();
     let args_rev: packed::Bytes = args_bytes.into_iter().rev().collect::<Vec<_>>().pack();
 
@@ -179,9 +179,9 @@ fn lost_capacity_with_2_inputs() {
     .pack();
 
     let witness_bad_args = {
-        let mut args_bad: packed::Bytes = misc::random_bytes().pack();
+        let mut args_bad: packed::Bytes = misc::randomize_bytes().pack();
         while args_rev.as_slice() == args_bad.as_slice() {
-            args_bad = misc::random_bytes().pack();
+            args_bad = misc::randomize_bytes().pack();
         }
 
         let lock_args = packed::BytesOpt::new_builder().set(Some(args_bad)).build();
@@ -274,10 +274,10 @@ fn lost_capacity_with_2_inputs() {
 fn add_capacity_without_ownership() {
     crate::setup();
 
-    let args_bytes_extra = misc::random_bytes();
-    let mut args_bytes = misc::random_bytes();
+    let args_bytes_extra = misc::randomize_bytes();
+    let mut args_bytes = misc::randomize_bytes();
     while args_bytes_extra == args_bytes {
-        args_bytes = misc::random_bytes();
+        args_bytes = misc::randomize_bytes();
     }
 
     let args_extra: packed::Bytes = args_bytes_extra.pack();
@@ -350,11 +350,11 @@ fn add_capacity_without_ownership() {
     .pack();
 
     let witness_bad_args = {
-        let mut args_bad: packed::Bytes = misc::random_bytes().pack();
+        let mut args_bad: packed::Bytes = misc::randomize_bytes().pack();
         while args_rev_extra.as_slice() == args_bad.as_slice()
             || args_rev.as_slice() == args_bad.as_slice()
         {
-            args_bad = misc::random_bytes().pack();
+            args_bad = misc::randomize_bytes().pack();
         }
 
         let lock_args = packed::BytesOpt::new_builder().set(Some(args_bad)).build();

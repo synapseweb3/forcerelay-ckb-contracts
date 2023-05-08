@@ -20,15 +20,15 @@ pub fn main() -> Result<()> {
     }
 
     let client_cell_index = load_usize_from_argv(argv, CLIENT_ARG_INDEX)?;
-    debug!("client cell index = {}", client_cell_index);
+    debug!("client cell index = {client_cell_index}");
 
     let witness_index = load_usize_from_argv(argv, WITNESS_ARG_INDEX)?;
-    debug!("witness index = {}", witness_index);
+    debug!("witness index = {witness_index}");
 
     let client: Client = {
         let data = hl::load_cell_data(client_cell_index, Source::CellDep)?;
         let client = ClientReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
-        debug!("packed client = {}", client);
+        debug!("packed client = {client}");
         client.unpack()
     };
 

@@ -3,5 +3,5 @@
 ## Test Case: Client Type Lock
 
 Data are from mainnet:
-- Slots: 5246088 ~ 5246151
+- Slots: 6268480 ~ 6268543
 - Forked Headers: None

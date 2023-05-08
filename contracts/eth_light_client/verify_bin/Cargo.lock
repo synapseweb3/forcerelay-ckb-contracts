@@ -217,7 +217,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.2.0-alpha"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=feec415#feec41534b2704055f97f0d17561e5b636f07287"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=9b409ed#9b409ed7cfd3e3aed60bfc7b0b6bcf03627658c7"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",

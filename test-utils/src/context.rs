@@ -63,7 +63,7 @@ impl Context {
                 cell_output
             }
         };
-        let out_point = misc::random_out_point();
+        let out_point = misc::randomize_out_point();
 
         self.cells
             .insert(out_point.clone(), (cell_output.clone(), data.clone()));

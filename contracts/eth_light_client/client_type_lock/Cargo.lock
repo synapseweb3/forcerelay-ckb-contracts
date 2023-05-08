@@ -3,6 +3,16 @@
 version = 3
 
 [[package]]
+name = "blake2b-rs"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a89a8565807f21b913288968e391819e7f9b2f0f46c7b89549c051cccf3a2771"
+dependencies = [
+ "cc",
+ "cty",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -95,6 +105,12 @@ dependencies = [
  "generic-array",
  "typenum",
 ]
+
+[[package]]
+name = "cty"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b365fabc795046672053e29c954733ec3b05e4be654ab130fe8f1f94d7051f35"
 
 [[package]]
 name = "darling"
@@ -217,7 +233,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.2.0-alpha"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=feec415#feec41534b2704055f97f0d17561e5b636f07287"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=9b409ed#9b409ed7cfd3e3aed60bfc7b0b6bcf03627658c7"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -296,6 +312,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 name = "ibc-ckb_contracts-eth_light_client-client_type_lock"
 version = "0.2.0-alpha"
 dependencies = [
+ "blake2b-rs",
  "ckb-std",
  "eth_light_client_in_ckb-verification",
 ]
