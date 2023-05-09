@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, release/* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, release/* ]
 defaults:
   run:
     shell: bash
@@ -11,7 +11,7 @@ env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
   RUST_BACKTRACE: full
-  RUST_TOOLCHAIN: 1.67.0
+  RUST_TOOLCHAIN: 1.68.2
 jobs:
   #
   # Contracts
@@ -20,7 +20,7 @@ jobs:
     name: Checks / Format (contracts)
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
     name: Checks / Lint (contracts)
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
     needs: [ format-contracts, lint-contracts ]
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     env:
       CARGO_BUILD_ARGS: --features debugging
     steps:
@@ -112,7 +112,7 @@ jobs:
     needs: [ run-tests ]
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3

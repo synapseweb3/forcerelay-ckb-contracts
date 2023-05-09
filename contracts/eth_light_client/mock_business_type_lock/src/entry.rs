@@ -1,9 +1,10 @@
-use alloc::string::ToString as _;
+use alloc::{ffi::CString, string::ToString as _};
 
+#[cfg(feature = "debugging")]
+use ckb_std::ckb_types::prelude::Pack as StdPack;
 use ckb_std::{
     ckb_constants::Source,
     ckb_types::{core::ScriptHashType, packed::Byte32Reader},
-    cstr_core::CString,
     high_level as hl,
 };
 use eth_light_client_in_ckb_verification::types::prelude::*;
@@ -16,7 +17,7 @@ pub fn main() -> Result<()> {
     debug!("{} Starting ...", module_path!());
 
     let args = hl::load_script()?.args();
-    debug!("args = {:#x}", args);
+    debug!("args = {args:#x}");
     if args.len() != 32 * 2 {
         return Err(Error::IncorrectArgs);
     }
@@ -27,8 +28,8 @@ pub fn main() -> Result<()> {
 
     let client_cell_type_hash = Byte32Reader::new_unchecked(client_cell_type_hash_slice);
     let bin_cell_type_hash = Byte32Reader::new_unchecked(bin_cell_type_hash_slice);
-    debug!("client cell type hash = {:#x}", client_cell_type_hash);
-    debug!("   bin cell type hash = {:#x}", bin_cell_type_hash);
+    debug!("client cell type hash = {client_cell_type_hash:#x}");
+    debug!("   bin cell type hash = {bin_cell_type_hash:#x}");
 
     let mut client_cell_index_opt = None;
     let mut bin_cell_index_opt = None;
@@ -37,7 +38,7 @@ pub fn main() -> Result<()> {
         hl::QueryIter::new(hl::load_cell_type_hash, Source::CellDep).enumerate()
     {
         if let Some(type_hash) = type_hash_opt {
-            debug!("{}-th type hash: {:#x}", index, type_hash.pack());
+            debug!("{index}-th type hash: {:#x}", StdPack::pack(&type_hash));
             if type_hash == client_cell_type_hash.as_slice() {
                 client_cell_index_opt = Some(index);
             } else if type_hash == bin_cell_type_hash.as_slice() {
@@ -58,17 +59,13 @@ pub fn main() -> Result<()> {
 
     let witness_index_string = CString::new(WITNESS_INDEX.to_string())?;
 
-    let retcode = hl::exec_cell(
+    hl::exec_cell(
         bin_cell_type_hash.as_slice(),
         ScriptHashType::Type,
         0,
         0,
         &[&client_cell_index_string, &witness_index_string],
     )?;
-
-    if retcode != 0 {
-        return Err(Error::FailedToExecuteBinCell);
-    }
 
     debug!("{} DONE.", module_path!());
 

@@ -9,12 +9,13 @@ homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
-ckb-script    = "0.107.0"
-ckb-types     = "0.107.0"
-ckb-traits    = "0.107.0"
-ckb-error     = "0.107.0"
+ckb-script    = "0.108.1"
+ckb-types     = "0.108.1"
+ckb-traits    = "0.108.1"
+ckb-error     = "0.108.1"
 log = "0.4.17"
 rand = "0.8.5"
 
 [dev-dependencies]
+ckb-hash      = "0.108.1"
 env_logger = "0.10.0"

@@ -1,19 +1,16 @@
-cargo-features = ["per-package-target"]
-
 [package]
 name = "ibc-ckb_contracts-eth_light_client-verify_bin"
-version = "0.1.0-alpha.0"
+version = "0.2.0-alpha"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
 description = "An IBC implementation of ETH light client in CKB contract (verify bin part)."
 homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
-default-target = "riscv64imac-unknown-none-elf"
 
 [dependencies]
-ckb-std = "0.10.0"
-eth_light_client_in_ckb-verification = { version = "0.1.0-alpha.0", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "e94ec1a" }
+ckb-std = "0.13.0"
+eth_light_client_in_ckb-verification = { version = "0.2.0-alpha", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "388bfd4" }
 
 [features]
 default = []
@@ -23,5 +20,4 @@ debugging = []
 overflow-checks = true
 lto = false
 codegen-units = 1
-panic = 'abort'
 strip = true

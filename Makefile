@@ -1,5 +1,5 @@
-# Docker: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
-BUILD_ENV_DOCKER := yangby0cryptape/ibc-ckb-contracts-build-env@sha256:7047fe6e56a6dbf2e7406ef2d217366c2c2f6b2a3d46e96a5d9988a0dfcfb1b6
+# Docker: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
+BUILD_ENV_DOCKER := yangby0cryptape/ibc-ckb-contracts-build-env@sha256:71ef760b76260d3f9be6bf8442e6840f186328e30f1e73e8044bdf2bf467e1aa
 RUST_TOOLCHAIN_TARGET := riscv64imac-unknown-none-elf
 PROJECT_PREFIX := ibc-ckb_contracts
 
@@ -10,7 +10,7 @@ CONTRACTS_DIR := contracts
 OUTPUT_DIR := build
 
 ALL_CONTRACTS := \
-    mock_contracts-reverse_args_lock \
+    mock_contracts-can_update_without_ownership_lock \
     eth_light_client-client_type_lock \
     eth_light_client-verify_bin \
     eth_light_client-mock_business_type_lock
@@ -101,8 +101,8 @@ test:
 # Targets to Build Contracts
 #
 
-.PHONY: mock_contracts-reverse_args_lock
-mock_contracts-reverse_args_lock: ${OUTPUT_DIR}/mock_contracts-reverse_args_lock
+.PHONY: mock_contracts-can_update_without_ownership_lock
+mock_contracts-can_update_without_ownership_lock: ${OUTPUT_DIR}/mock_contracts-can_update_without_ownership_lock
 
 .PHONY: eth_light_client-client_type_lock
 eth_light_client-client_type_lock: ${OUTPUT_DIR}/eth_light_client-client_type_lock
