@@ -13,7 +13,10 @@ ALL_CONTRACTS := \
     mock_contracts-can_update_without_ownership_lock \
     eth_light_client-client_type_lock \
     eth_light_client-verify_bin \
-    eth_light_client-mock_business_type_lock
+    eth_light_client-mock_business_type_lock \
+	ics-conn \
+	ics-chan \
+	ics-packet
 
 .PHONY: all-contracts all-contracts-in-docker
 all-contracts: ${ALL_CONTRACTS}
@@ -112,3 +115,12 @@ eth_light_client-verify_bin: ${OUTPUT_DIR}/eth_light_client-verify_bin
 
 .PHONY: eth_light_client-mock_business_type_lock
 eth_light_client-mock_business_type_lock: ${OUTPUT_DIR}/eth_light_client-mock_business_type_lock
+
+.PHONY: ics-conn
+ics-conn: ${OUTPUT_DIR}/ics-conn
+
+.PHONY: ics-chan
+ics-chan: ${OUTPUT_DIR}/ics-chan
+
+.PHONY: ics-packet
+ics-packet: ${OUTPUT_DIR}/ics-packet
