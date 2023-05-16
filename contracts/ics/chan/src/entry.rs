@@ -1,6 +1,6 @@
 use crate::error::{Error, Result};
 use ckb_ics_axon::handler::{
-    handle_channel_open_ack_and_confirm, handle_channel_open_init_and_try, Client, IbcChannel,
+    handle_channel_open_ack_and_confirm, handle_channel_open_init_and_try, IbcChannel,
     IbcConnections,
 };
 use ckb_ics_axon::message::{Envelope, MsgType};
@@ -9,6 +9,7 @@ use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
+use axon_client::AxonClient as Client;
 
 pub fn main() -> Result<()> {
     let envelope = load_envelope()?;
@@ -20,8 +21,9 @@ pub fn main() -> Result<()> {
         _ => return Ok(()),
     }
 
-    let client_data = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-    let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+    // let client_data = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
+    // let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+    let client = load_client()?;
 
     let input_data = hl::load_cell_data(0, Source::GroupInput)?;
     let expected_input_hash: [u8; 32] = input_data
@@ -120,4 +122,12 @@ fn load_envelope() -> Result<Envelope> {
     let envelope_bytes = envelope_data.to_opt().unwrap();
     let envelope_slice = envelope_bytes.as_slice();
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
+}
+
+fn load_client() -> Result<Client> {
+    use alloc::string::ToString;
+    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
+    let metadata_type_script = hl::load_cell_type(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?.unwrap();
+    let client_id = metadata_type_script.args().to_string();
+    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }

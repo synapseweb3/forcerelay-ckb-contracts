@@ -1,19 +1,17 @@
 [package]
-name = "ibc-ckb_contracts-ics-conn"
-version = "0.1.0-alpha.0"
+name = "axon-client"
+version = "0.1.0"
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
-ckb-std = "0.13.0"
 ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "6641b0"}
+axon-tools-riscv = {version = "0.1.1", features = ["proof"]}
+axon-types = {git = "https://github.com/axonweb3/axon-contract", rev = "8c2338a"}
 rlp ={ version = "0.5.2", default-features = false}
-ckb-standalone-types ={ version = "0.1.2", default-features = false}
-tiny-keccak = {version = "2.0.2", features = ["keccak"]}
-
-axon-client = {version = "*", path = "../axon_client"}
+molecule = { version = "0.7", default-features = false }
 
 [features]
 default = []

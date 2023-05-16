@@ -1,6 +1,6 @@
 use ckb_ics_axon::handler::{
     handle_msg_ack_inbox_packet, handle_msg_ack_outbox_packet, handle_msg_ack_packet,
-    handle_msg_recv_packet, handle_msg_send_packet, Client, IbcChannel, IbcPacket,
+    handle_msg_recv_packet, handle_msg_send_packet, IbcChannel, IbcPacket,
 };
 use ckb_ics_axon::message::{
     Envelope, MsgAckInboxPacket, MsgAckOutboxPacket, MsgAckPacket, MsgType,
@@ -9,6 +9,7 @@ use ckb_ics_axon::message::{MsgRecvPacket, MsgSendPacket};
 use ckb_standalone_types::prelude::Entity;
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
+use axon_client::AxonClient as Client;
 
 use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
@@ -22,9 +23,7 @@ pub fn main() -> Result<()> {
     let envelope = load_envelope()?;
     match &envelope.msg_type {
         MsgType::MsgSendPacket => {
-            let client_data =
-                hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-            let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+            let client = load_client()?;
 
             let old_channel: IbcChannel = load_and_validate_old_channel_from_idx(0)?;
             let new_channel: IbcChannel = load_and_validate_new_channel_from_idx(0)?;
@@ -35,9 +34,7 @@ pub fn main() -> Result<()> {
                 .map_err(|_| Error::PacketProofInvalid)
         }
         MsgType::MsgRecvPacket => {
-            let client_data =
-                hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-            let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+            let client = load_client()?;
 
             let old_channel: IbcChannel = load_and_validate_old_channel_from_idx(0)?;
             let new_channel: IbcChannel = load_and_validate_new_channel_from_idx(0)?;
@@ -61,9 +58,7 @@ pub fn main() -> Result<()> {
             handle_msg_ack_inbox_packet(old_ibc_packet, msg).map_err(|_| Error::PacketProofInvalid)
         }
         MsgType::MsgAckPacket => {
-            let client_data =
-                hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-            let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+            let client = load_client()?;
 
             let old_channel: IbcChannel = load_and_validate_old_channel_from_idx(0)?;
             let new_channel: IbcChannel = load_and_validate_new_channel_from_idx(0)?;
@@ -200,4 +195,12 @@ fn keccak256(slice: &[u8]) -> [u8; 32] {
     let mut output = [0u8; 32];
     hasher.finalize(&mut output);
     output
+}
+
+fn load_client() -> Result<Client> {
+    use alloc::string::ToString;
+    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
+    let metadata_type_script = hl::load_cell_type(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?.unwrap();
+    let client_id = metadata_type_script.args().to_string();
+    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }

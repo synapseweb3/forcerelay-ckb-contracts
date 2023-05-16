@@ -1,0 +1,63 @@
+#![no_std]
+
+extern crate alloc;
+use ckb_ics_axon::handler::Client;
+use ckb_ics_axon::object::{VerifyError, Object};
+use ckb_ics_axon::proof::ObjectProof;
+use ckb_ics_axon::verify_message;
+use axon_tools_riscv::types::{H256, Validator, AxonBlock, Proof as AxonProof};
+use alloc::string::String;
+use alloc::vec::Vec;
+use axon_types::metadata::Metadata;
+use molecule::prelude::Entity;
+
+pub struct AxonClient {
+    pub id: String,
+    pub validators: Vec<Validator>,
+}
+
+impl Client for AxonClient {
+    fn verify_object<O: Object>(&mut self, obj: O, proof: ObjectProof) -> Result<(), VerifyError> {
+        let block = rlp::decode::<AxonBlock>(&proof.block).unwrap();
+
+        verify_message(block.header.receipts_root, proof.receipt, obj, proof.receipt_proof)?;
+
+        let axon_proof = rlp::decode::<AxonProof>(&proof.axon_proof).unwrap();
+
+        axon_tools_riscv::verify_proof(block, proof.state_root, &mut self.validators, axon_proof).map_err(|_| VerifyError::InvalidReceiptProof)
+    }
+
+    fn client_id(&self) -> &str {
+        &self.id
+    }
+}
+
+impl AxonClient {
+    pub fn new(id: String, slice: &[u8]) -> Result<Self, Error> {
+        let metadata = Metadata::from_slice(slice).map_err(|_| Error::MetadataSerde)?;
+        let validators = metadata.validators();
+        let mut client_validators: Vec<Validator> = Vec::new();
+        for i in 0..validators.len() {
+            let v = validators.get(i).unwrap();
+            let bls_pub_key = v.bls_pub_key().as_slice().to_vec();
+            let address: [u8; 20] = v.address().as_slice().try_into().map_err(|_| Error::MetadataSerde)?;
+            let height: [u8; 4] = v.propose_weight().as_slice().try_into().unwrap();
+            let weight: [u8; 4] = v.vote_weight().as_slice().try_into().unwrap();
+            let validator = Validator {
+                bls_pub_key: bls_pub_key.into(),
+                address: address.into(),
+                propose_weight: u32::from_le_bytes(height),
+                vote_weight: u32::from_le_bytes(weight),
+            };
+            client_validators.push(validator);
+        }
+        Ok(AxonClient {
+            id,
+            validators: client_validators,
+        })
+    }
+}
+
+pub enum Error {
+    MetadataSerde,
+}
