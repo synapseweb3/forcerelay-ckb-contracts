@@ -12,7 +12,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 ckb-std = "0.13.0"
 # TODO Replace blake2b-rs with ckb-hash if ckb-hash support no-std.
 blake2b-rs = "0.2.0"
-eth_light_client_in_ckb-verification = { version = "0.2.0-alpha", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "388bfd4" }
+eth_light_client_in_ckb-verification = { version = "0.2.0-alpha", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "4366773" }
 
 [features]
 default = []

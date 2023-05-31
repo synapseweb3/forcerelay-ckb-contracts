@@ -30,6 +30,21 @@ fn update_case_1() {
     update(param);
 }
 
+#[test]
+fn update_case_2() {
+    let param = UpdateParameter {
+        case_id: 1,
+        clients_count: 9,
+        minimal_updates_count: 32,
+        cell_dep_id: 5,
+        input_id: 6,
+        client_filename: "client-6268480_6268511.data",
+        new_client_filename: "client-6268480_6268543.data",
+        proof_update_filename: "proof_update-6268512_6268543.data",
+    };
+    update(param);
+}
+
 struct UpdateParameter {
     case_id: usize,
     clients_count: u8,
