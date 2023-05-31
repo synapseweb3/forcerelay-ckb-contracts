@@ -20,7 +20,7 @@ jobs:
     name: Checks / Format (contracts)
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
     name: Checks / Lint (contracts)
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
     needs: [ format-contracts, lint-contracts ]
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     env:
       CARGO_BUILD_ARGS: --features debugging
     steps:
@@ -112,7 +112,7 @@ jobs:
     needs: [ run-tests ]
     runs-on: ubuntu-latest
     container:
-      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.1.0-alpha.0
+      image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
