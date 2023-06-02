@@ -6,10 +6,12 @@ use ckb_ics_axon::message::{
     Envelope, MsgConnectionOpenAck, MsgConnectionOpenConfirm, MsgConnectionOpenInit,
     MsgConnectionOpenTry, MsgType,
 };
+use ckb_ics_axon::ConnectionArgs;
+
+use axon_client::AxonClient as Client;
 use ckb_standalone_types::prelude::Entity;
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
-use axon_client::AxonClient as Client;
 
 use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
@@ -27,20 +29,28 @@ pub fn main() -> Result<()> {
         | MsgType::MsgChannelOpenTry
         | MsgType::MsgChannelOpenAck
         | MsgType::MsgChannelOpenConfirm => return Ok(()),
+        MsgType::MsgClientCreate => return check_create(),
         _ => return Err(Error::UnexpectedMsg),
     }
 
-    let _current_script = hl::load_script().map_err(|_| Error::LoadScriptErr)?;
-    // let client_data = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-    // let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
     let client = load_client()?;
 
-    let input_data = hl::load_cell_data(0, Source::GroupInput)?;
+    let new_lock = hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ConnectionLock)?;
+    let new_lock_args = new_lock.args();
+    let new_connection_args =
+        ConnectionArgs::from_slice(new_lock_args.as_slice()).map_err(|_| Error::ConnectionLock)?;
+
+    let old_lock = hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ConnectionLock)?;
+    let old_lock_args = old_lock.args();
+    let old_connection_args =
+        ConnectionArgs::from_slice(old_lock_args.as_slice()).map_err(|_| Error::ConnectionLock)?;
+
+    let input_data = hl::load_cell_data(0, Source::Input)?;
     let expected_input_hash: [u8; 32] = input_data
         .try_into()
         .map_err(|_| Error::ConnectionHashUnmatch)?;
 
-    let output_data = hl::load_cell_data(0, Source::GroupOutput)?;
+    let output_data = hl::load_cell_data(0, Source::Output)?;
     let expected_output_hash: [u8; 32] = output_data
         .try_into()
         .map_err(|_| Error::ConnectionHashUnmatch)?;
@@ -71,14 +81,35 @@ pub fn main() -> Result<()> {
 
     let new_connection_cell = decode_connection_cell(new_connection_slice)?;
 
-    verify(old_connection_cell, new_connection_cell, envelope, client)?;
+    verify(
+        old_connection_cell,
+        old_connection_args,
+        new_connection_cell,
+        new_connection_args,
+        envelope,
+        client,
+    )?;
 
     Ok(())
 }
 
+fn check_create() -> Result<()> {
+    let client = load_client()?;
+    let current_script = hl::load_script().map_err(|_| Error::LoadScriptErr)?;
+    let args = current_script.args();
+    let actual_client_id = args.as_slice();
+    if actual_client_id != client.id {
+        Err(Error::ClientCreateWrongClientId)
+    } else {
+        Ok(())
+    }
+}
+
 fn verify(
     old: IbcConnections,
+    old_args: ConnectionArgs,
     new: IbcConnections,
+    new_args: ConnectionArgs,
     envelope: Envelope,
     client: Client,
 ) -> Result<()> {
@@ -86,25 +117,25 @@ fn verify(
         MsgType::MsgConnectionOpenInit => {
             let msg = decode::<MsgConnectionOpenInit>(&envelope.content)
                 .map_err(|_| Error::MsgEncoding)?;
-            handle_msg_connection_open_init(client, old, new, msg)
+            handle_msg_connection_open_init(client, old, old_args, new, new_args, msg)
                 .map_err(|_| Error::ConnectionProofInvalid)
         }
         MsgType::MsgConnectionOpenTry => {
             let msg = decode::<MsgConnectionOpenTry>(&envelope.content)
                 .map_err(|_| Error::MsgEncoding)?;
-            handle_msg_connection_open_try(client, old, new, msg)
+            handle_msg_connection_open_try(client, old, old_args, new, new_args, msg)
                 .map_err(|_| Error::ConnectionProofInvalid)
         }
         MsgType::MsgConnectionOpenAck => {
             let msg = decode::<MsgConnectionOpenAck>(&envelope.content)
                 .map_err(|_| Error::MsgEncoding)?;
-            handle_msg_connection_open_ack(client, old, new, msg)
+            handle_msg_connection_open_ack(client, old, old_args, new, new_args, msg)
                 .map_err(|_| Error::ConnectionProofInvalid)
         }
         MsgType::MsgConnectionOpenConfirm => {
             let msg = decode::<MsgConnectionOpenConfirm>(&envelope.content)
                 .map_err(|_| Error::MsgEncoding)?;
-            handle_msg_connection_open_confirm(client, old, new, msg)
+            handle_msg_connection_open_confirm(client, old, old_args, new, new_args, msg)
                 .map_err(|_| Error::ConnectionProofInvalid)
         }
         _ => Err(Error::UnexpectedMsg),
@@ -143,9 +174,14 @@ fn load_envelope() -> Result<Envelope> {
 }
 
 fn load_client() -> Result<Client> {
-    use alloc::string::ToString;
     let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-    let metadata_type_script = hl::load_cell_type(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?.unwrap();
-    let client_id = metadata_type_script.args().to_string();
+    let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
+        .map_err(|_| Error::LoadCellDataErr)?
+        .unwrap();
+    let client_id: [u8; 32] = metadata_type_script
+        .args()
+        .as_slice()
+        .try_into()
+        .map_err(|_| Error::LoadCellDataErr)?;
     Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }
