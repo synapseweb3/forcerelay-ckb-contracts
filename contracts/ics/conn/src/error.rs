@@ -12,7 +12,6 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
-    ClientEncoding,
     ConnectionEncoding,
     EnvelopeEncoding,
     MsgEncoding,
@@ -26,6 +25,8 @@ pub enum Error {
     UnexpectedMsg,
     ConnectionProofInvalid,
     ConnectionHashUnmatch,
+    ClientCreateWrongClientId,
+    ConnectionLock,
 }
 
 impl From<SysError> for Error {

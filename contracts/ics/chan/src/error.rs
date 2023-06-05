@@ -12,7 +12,6 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
-    ClientEncoding,
     ChannelEncoding,
     ConnectionEncoding,
     EnvelopeEncoding,
@@ -21,6 +20,8 @@ pub enum Error {
     WitnessTooMany,
 
     LoadCellDataErr,
+    ConnectionLock,
+    ChannelLock,
 
     UnexpectedMsg,
     ChannelProofInvalid,

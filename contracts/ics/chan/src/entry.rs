@@ -1,9 +1,11 @@
 use crate::error::{Error, Result};
+use axon_client::AxonClient as Client;
 use ckb_ics_axon::handler::{
-    handle_channel_open_ack_and_confirm, handle_channel_open_init_and_try, Client, IbcChannel,
+    handle_channel_open_ack_and_confirm, handle_channel_open_init_and_try, IbcChannel,
     IbcConnections,
 };
 use ckb_ics_axon::message::{Envelope, MsgType};
+use ckb_ics_axon::{ChannelArgs, ConnectionArgs};
 use ckb_standalone_types::prelude::Entity;
 use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
@@ -20,24 +22,22 @@ pub fn main() -> Result<()> {
         _ => return Ok(()),
     }
 
-    let client_data = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
-    let client = decode::<Client>(&client_data).map_err(|_| Error::ClientEncoding)?;
+    let client = load_client()?;
 
-    let input_data = hl::load_cell_data(0, Source::GroupInput)?;
+    let input_data = hl::load_cell_data(0, Source::Input)?;
     let expected_input_hash: [u8; 32] = input_data
         .try_into()
         .map_err(|_| Error::ChannelHashUnmatch)?;
 
-    let output_data = hl::load_cell_data(0, Source::GroupOutput)?;
+    let output_data = hl::load_cell_data(0, Source::Output)?;
     let expected_output_hash: [u8; 32] = output_data
         .try_into()
         .map_err(|_| Error::ChannelHashUnmatch)?;
 
     let witness_args0 = hl::load_witness_args(0, Source::Input)?;
-    let witness_args1 = hl::load_witness_args(0, Source::Output)?;
 
     let old_cell_data = witness_args0.input_type();
-    let new_cell_data = witness_args1.output_type();
+    let new_cell_data = witness_args0.output_type();
 
     if old_cell_data.is_none() || new_cell_data.is_none() {
         return Err(Error::ChannelEncoding);
@@ -76,20 +76,56 @@ fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) 
             let channel =
                 decode::<IbcChannel>(channel_slice).map_err(|_| Error::ChannelEncoding)?;
 
+            let new_lock =
+                hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ConnectionLock)?;
+            let new_lock_args = new_lock.args();
+            let new_connection_args = ConnectionArgs::from_slice(new_lock_args.as_slice())
+                .map_err(|_| Error::ConnectionLock)?;
+
+            let old_lock =
+                hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ConnectionLock)?;
+            let old_lock_args = old_lock.args();
+            let old_connection_args = ConnectionArgs::from_slice(old_lock_args.as_slice())
+                .map_err(|_| Error::ConnectionLock)?;
+
+            let channel_lock = hl::load_cell_lock(1, Source::Output)?;
+            let channel_lock_args = channel_lock.args();
+            let channel_args = ChannelArgs::from_slice(channel_lock_args.as_slice())
+                .map_err(|_| Error::ChannelLock)?;
+
             handle_channel_open_init_and_try(
                 client,
                 channel,
+                channel_args,
                 envelope,
                 old_connections,
+                old_connection_args,
                 new_connections,
+                new_connection_args,
             )
             .map_err(|_| Error::ChannelProofInvalid)
         }
         MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => {
             let old_channel: IbcChannel = decode(old_data).map_err(|_| Error::ChannelEncoding)?;
             let new_channel: IbcChannel = decode(new_data).map_err(|_| Error::ChannelEncoding)?;
-            handle_channel_open_ack_and_confirm(client, envelope, old_channel, new_channel)
-                .map_err(|_| Error::ChannelEncoding)
+            let new_lock = hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ChannelLock)?;
+            let new_lock_args = new_lock.args();
+            let new_channel_args = ChannelArgs::from_slice(new_lock_args.as_slice())
+                .map_err(|_| Error::ChannelLock)?;
+
+            let old_lock = hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ChannelLock)?;
+            let old_lock_args = old_lock.args();
+            let old_channel_args = ChannelArgs::from_slice(old_lock_args.as_slice())
+                .map_err(|_| Error::ChannelLock)?;
+            handle_channel_open_ack_and_confirm(
+                client,
+                envelope,
+                old_channel,
+                old_channel_args,
+                new_channel,
+                new_channel_args,
+            )
+            .map_err(|_| Error::ChannelEncoding)
         }
         _ => Err(Error::UnexpectedMsg),
     }
@@ -120,4 +156,17 @@ fn load_envelope() -> Result<Envelope> {
     let envelope_bytes = envelope_data.to_opt().unwrap();
     let envelope_slice = envelope_bytes.as_slice();
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
+}
+
+fn load_client() -> Result<Client> {
+    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
+    let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
+        .map_err(|_| Error::LoadCellDataErr)?
+        .unwrap();
+    let client_id: [u8; 32] = metadata_type_script
+        .args()
+        .as_slice()
+        .try_into()
+        .map_err(|_| Error::LoadCellDataErr)?;
+    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }
