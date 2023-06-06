@@ -17,7 +17,7 @@ axon-client = {version = "*", path = "../axon_client"}
 
 [features]
 default = []
-debugging = []
+debugging = ["axon-client/debugging"]
 
 [profile.release]
 overflow-checks = true
