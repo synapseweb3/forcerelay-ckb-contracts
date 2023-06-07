@@ -176,7 +176,13 @@ fn load_and_validate_ibc_packet_from_idx(
     source: Source,
 ) -> Result<(IbcPacket, PacketArgs)> {
     let witness = hl::load_witness_args(idx, source)?;
-    let cell_data = witness.input_type();
+
+    let cell_data = if source == Source::Input {
+        witness.input_type()
+    } else {
+        witness.output_type()
+    };
+
     if cell_data.is_none() {
         return Err(Error::WitnessIsNotExisted);
     }
@@ -191,7 +197,7 @@ fn load_and_validate_ibc_packet_from_idx(
         return Err(Error::ChannelHashUnmatch);
     }
 
-    let lock = hl::load_cell_lock(idx, Source::Output)?;
+    let lock = hl::load_cell_lock(idx, source)?;
     let lock_args = lock.args();
     let packet_args =
         PacketArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::PacketLock)?;

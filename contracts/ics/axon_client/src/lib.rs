@@ -18,7 +18,7 @@ pub struct AxonClient {
 impl Client for AxonClient {
     fn verify_object<O: Object>(&mut self, obj: O, proof: ObjectProof) -> Result<(), VerifyError> {
         #[cfg(feature = "debugging")]
-        if self.id == [0; 32] && self.validators.is_empty() {
+        if self.validators.is_empty() {
             return Ok(());
         }
         let block = rlp::decode::<AxonBlock>(&proof.block).unwrap();

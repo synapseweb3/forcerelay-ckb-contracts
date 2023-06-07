@@ -19,7 +19,6 @@ pub enum Error {
     WitnessIsIncorrect,
     WitnessTooMany,
 
-    LoadScriptErr,
     LoadCellDataErr,
 
     UnexpectedMsg,
@@ -27,6 +26,7 @@ pub enum Error {
     ConnectionHashUnmatch,
     ClientCreateWrongClientId,
     ConnectionLock,
+    ClientCreateWrongConnectionCell,
 }
 
 impl From<SysError> for Error {
