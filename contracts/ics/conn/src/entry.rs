@@ -118,12 +118,10 @@ fn load_connection_cell(idx: usize, source: Source) -> Result<(IbcConnections, C
     };
 
     let cell_data = hl::load_cell_data(idx, source)?;
-    let expected_hash: [u8; 32] = cell_data
-        .try_into()
-        .map_err(|_| Error::ConnectionHashUnmatch)?;
+    let expected_hash: [u8; 32] = cell_data.try_into().map_err(|_| Error::CellDataUnmatch)?;
 
     if witness_data.is_none() {
-        return Err(Error::ConnectionEncoding);
+        return Err(Error::WitnessInputOrOutputIsNone);
     }
 
     let witness_bytes = witness_data.to_opt().unwrap();

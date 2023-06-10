@@ -17,6 +17,8 @@ pub enum Error {
     MsgEncoding,
 
     WitnessIsIncorrect,
+    WitnessInputOrOutputIsNone,
+    CellDataUnmatch,
 
     FailedToLoadClientCellData,
     FailedToLoadClientTypeScript,

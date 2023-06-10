@@ -7,7 +7,7 @@ homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
-ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "029897a"}
+ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "bc41087"}
 axon-tools-riscv = {version = "0.1.1", features = ["proof"]}
 axon-types = {git = "https://github.com/axonweb3/axon-contract", rev = "8c2338a"}
 rlp ={ version = "0.5.2", default-features = false}
