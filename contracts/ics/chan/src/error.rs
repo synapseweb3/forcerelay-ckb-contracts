@@ -17,7 +17,6 @@ pub enum Error {
     EnvelopeEncoding,
 
     WitnessIsIncorrect,
-    WitnessTooMany,
 
     LoadCellDataErr,
     ConnectionLock,

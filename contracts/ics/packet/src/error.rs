@@ -19,7 +19,6 @@ pub enum Error {
 
     WitnessIsNotExisted,
     WitnessIsIncorrect,
-    WitnessTooMany,
 
     LoadCellDataErr,
     ChannelLock,

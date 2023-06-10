@@ -12,7 +12,6 @@ use ckb_standalone_types::prelude::Entity;
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
 
-use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
 
 use crate::error::{Error, Result};
@@ -153,20 +152,14 @@ fn load_and_validate_channel_from_idx(
 
 #[inline]
 fn load_envelope() -> Result<Envelope> {
-    let witness_len = {
-        if let Err(SysError::LengthNotEnough(len)) = hl::load_witness_args(99, Source::Input) {
-            len
-        } else {
-            return Err(Error::WitnessTooMany);
-        }
-    };
+    let witness_len = hl::load_transaction()?.witnesses().len();
     let last_witness = hl::load_witness_args(witness_len - 1, Source::Input)?;
     let envelope_data = last_witness.output_type();
     if envelope_data.is_none() {
         return Err(Error::WitnessIsIncorrect);
     }
     let envelope_bytes = envelope_data.to_opt().unwrap();
-    let envelope_slice = envelope_bytes.as_slice();
+    let envelope_slice = &envelope_bytes.raw_data();
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
 }
 

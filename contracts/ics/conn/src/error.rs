@@ -17,7 +17,6 @@ pub enum Error {
     MsgEncoding,
 
     WitnessIsIncorrect,
-    WitnessTooMany,
 
     LoadCellDataErr,
 
