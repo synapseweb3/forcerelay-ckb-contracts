@@ -172,7 +172,7 @@ fn load_client() -> Result<AxonClient> {
         .unwrap();
     let client_id: [u8; 32] = metadata_type_script
         .args()
-        .as_slice()
+        .raw_data()
         .try_into()
         .map_err(|_| Error::FailedToLoadClientId)?;
     AxonClient::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
