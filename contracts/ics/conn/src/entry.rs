@@ -107,9 +107,9 @@ fn verify(
 
 fn load_connection_cell(idx: usize, source: Source) -> Result<(IbcConnections, ConnectionArgs)> {
     let lock = hl::load_cell_lock(idx, source).map_err(|_| Error::ConnectionLock)?;
-    let lock_args = lock.args();
+    let lock_args = lock.args().raw_data();
     let connection_args =
-        ConnectionArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::ConnectionLock)?;
+        ConnectionArgs::from_slice(&lock_args).map_err(|_| Error::ConnectionLock)?;
 
     let witness_args = hl::load_witness_args(idx, source)?;
     let witness_data = if source == Source::Input {

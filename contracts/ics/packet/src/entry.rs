@@ -133,9 +133,8 @@ fn load_and_validate_channel_from_idx(
     }
 
     let lock = hl::load_cell_lock(idx, source)?;
-    let lock_args = lock.args();
-    let channel_args =
-        ChannelArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::ChannelLock)?;
+    let lock_args = lock.args().raw_data();
+    let channel_args = ChannelArgs::from_slice(&lock_args).map_err(|_| Error::ChannelLock)?;
 
     let bytes = cell_data.to_opt().unwrap();
     let slice = bytes.as_slice();
@@ -191,9 +190,8 @@ fn load_and_validate_ibc_packet_from_idx(
     }
 
     let lock = hl::load_cell_lock(idx, source)?;
-    let lock_args = lock.args();
-    let packet_args =
-        PacketArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::PacketLock)?;
+    let lock_args = lock.args().raw_data();
+    let packet_args = PacketArgs::from_slice(&lock_args).map_err(|_| Error::PacketLock)?;
     let packet = decode_ibc_packet(slice)?;
     Ok((packet, packet_args))
 }

@@ -48,10 +48,10 @@ impl AxonClient {
         let mut client_validators: Vec<Validator> = Vec::new();
         for i in 0..validators.len() {
             let v = validators.get(i).unwrap();
-            let bls_pub_key = v.bls_pub_key().as_slice().to_vec();
-            let address: [u8; 20] = v
-                .address()
-                .as_slice()
+            let bls_pub_key = v.bls_pub_key().raw_data().to_vec();
+            let address_data = v.address().raw_data();
+            let address: [u8; 20] = address_data
+                .as_ref()
                 .try_into()
                 .map_err(|_| Error::MetadataSerde)?;
             let height: [u8; 4] = v.propose_weight().as_slice().try_into().unwrap();

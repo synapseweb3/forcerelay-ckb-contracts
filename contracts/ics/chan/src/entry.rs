@@ -77,20 +77,20 @@ fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) 
 
             let new_lock =
                 hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ConnectionLock)?;
-            let new_lock_args = new_lock.args();
-            let new_connection_args = ConnectionArgs::from_slice(new_lock_args.as_slice())
-                .map_err(|_| Error::ConnectionLock)?;
+            let new_lock_args = new_lock.args().raw_data();
+            let new_connection_args =
+                ConnectionArgs::from_slice(&new_lock_args).map_err(|_| Error::ConnectionLock)?;
 
             let old_lock =
                 hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ConnectionLock)?;
-            let old_lock_args = old_lock.args();
-            let old_connection_args = ConnectionArgs::from_slice(old_lock_args.as_slice())
-                .map_err(|_| Error::ConnectionLock)?;
+            let old_lock_args = old_lock.args().raw_data();
+            let old_connection_args =
+                ConnectionArgs::from_slice(&old_lock_args).map_err(|_| Error::ConnectionLock)?;
 
             let channel_lock = hl::load_cell_lock(1, Source::Output)?;
-            let channel_lock_args = channel_lock.args();
-            let channel_args = ChannelArgs::from_slice(channel_lock_args.as_slice())
-                .map_err(|_| Error::ChannelLock)?;
+            let channel_lock_args = channel_lock.args().raw_data();
+            let channel_args =
+                ChannelArgs::from_slice(&channel_lock_args).map_err(|_| Error::ChannelLock)?;
 
             handle_channel_open_init_and_try(
                 client,
@@ -108,9 +108,9 @@ fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) 
             let old_channel: IbcChannel = decode(old_data).map_err(|_| Error::ChannelEncoding)?;
             let new_channel: IbcChannel = decode(new_data).map_err(|_| Error::ChannelEncoding)?;
             let new_lock = hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ChannelLock)?;
-            let new_lock_args = new_lock.args();
-            let new_channel_args = ChannelArgs::from_slice(new_lock_args.as_slice())
-                .map_err(|_| Error::ChannelLock)?;
+            let new_lock_args = new_lock.args().raw_data();
+            let new_channel_args =
+                ChannelArgs::from_slice(&new_lock_args).map_err(|_| Error::ChannelLock)?;
 
             let old_lock = hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ChannelLock)?;
             let old_lock_args = old_lock.args();
