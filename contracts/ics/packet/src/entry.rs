@@ -217,14 +217,15 @@ fn keccak256(slice: &[u8]) -> [u8; 32] {
 }
 
 fn load_client() -> Result<Client> {
-    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
+    let metadata =
+        hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::FailedToLoadClientCellData)?;
     let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
-        .map_err(|_| Error::LoadCellDataErr)?
+        .map_err(|_| Error::FailedToLoadClientTypeScript)?
         .unwrap();
     let client_id: [u8; 32] = metadata_type_script
         .args()
         .as_slice()
         .try_into()
-        .map_err(|_| Error::LoadCellDataErr)?;
-    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
+        .map_err(|_| Error::FailedToLoadClientId)?;
+    Client::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
 }

@@ -20,7 +20,10 @@ pub enum Error {
     WitnessIsNotExisted,
     WitnessIsIncorrect,
 
-    LoadCellDataErr,
+    FailedToLoadClientCellData,
+    FailedToLoadClientTypeScript,
+    FailedToLoadClientId,
+    FailedToCreateClient,
     ChannelLock,
     PacketLock,
 

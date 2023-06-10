@@ -18,7 +18,10 @@ pub enum Error {
 
     WitnessIsIncorrect,
 
-    LoadCellDataErr,
+    FailedToLoadClientCellData,
+    FailedToLoadClientTypeScript,
+    FailedToLoadClientId,
+    FailedToCreateClient,
 
     UnexpectedMsg,
     ConnectionProofInvalid,
