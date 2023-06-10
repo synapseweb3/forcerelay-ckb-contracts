@@ -43,18 +43,18 @@ pub fn main() -> Result<()> {
     }
 
     let old_bytes = old_cell_data.to_opt().unwrap();
-    let old_slice = old_bytes.as_slice();
-    if keccak256(old_slice) != expected_input_hash {
+    let old_slice = old_bytes.raw_data();
+    if keccak256(&old_slice) != expected_input_hash {
         return Err(Error::ChannelHashUnmatch);
     }
 
     let new_bytes = new_cell_data.to_opt().unwrap();
-    let new_slice = new_bytes.as_slice();
-    if keccak256(new_slice) != expected_output_hash {
+    let new_slice = new_bytes.raw_data();
+    if keccak256(&new_slice) != expected_output_hash {
         return Err(Error::ChannelHashUnmatch);
     }
 
-    verify(client, envelope, old_slice, new_slice)
+    verify(client, envelope, &old_slice, &new_slice)
 }
 
 fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) -> Result<()> {

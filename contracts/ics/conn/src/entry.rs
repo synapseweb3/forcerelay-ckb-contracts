@@ -10,7 +10,6 @@ use ckb_ics_axon::message::{
 use ckb_ics_axon::ConnectionArgs;
 
 use axon_client::AxonClient;
-use ckb_standalone_types::prelude::Entity;
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
 
@@ -128,13 +127,13 @@ fn load_connection_cell(idx: usize, source: Source) -> Result<(IbcConnections, C
     }
 
     let witness_bytes = witness_data.to_opt().unwrap();
-    let witness_slice = witness_bytes.as_slice();
+    let witness_slice = witness_bytes.raw_data();
 
-    if keccak256(witness_slice) != expected_hash {
+    if keccak256(&witness_slice) != expected_hash {
         return Err(Error::ConnectionHashUnmatch);
     }
 
-    let connection = decode_connection_cell(witness_slice)?;
+    let connection = decode_connection_cell(&witness_slice)?;
     Ok((connection, connection_args))
 }
 

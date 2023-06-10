@@ -137,15 +137,15 @@ fn load_and_validate_channel_from_idx(
     let channel_args = ChannelArgs::from_slice(&lock_args).map_err(|_| Error::ChannelLock)?;
 
     let bytes = cell_data.to_opt().unwrap();
-    let slice = bytes.as_slice();
+    let slice = bytes.raw_data();
 
     let data = hl::load_cell_data(0, source)?;
     let expected_hash: [u8; 32] = data.try_into().map_err(|_| Error::ChannelHashUnmatch)?;
 
-    if keccak256(slice) != expected_hash {
+    if keccak256(&slice) != expected_hash {
         return Err(Error::ChannelHashUnmatch);
     }
-    let channel = decode_channel_cell(slice)?;
+    let channel = decode_channel_cell(&slice)?;
     Ok((channel, channel_args))
 }
 
