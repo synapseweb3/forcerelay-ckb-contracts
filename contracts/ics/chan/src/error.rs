@@ -17,11 +17,9 @@ pub enum Error {
     EnvelopeEncoding,
 
     WitnessIsIncorrect,
+    WitnessTooMany,
 
-    FailedToLoadClientCellData,
-    FailedToLoadClientTypeScript,
-    FailedToLoadClientId,
-    FailedToCreateClient,
+    LoadCellDataErr,
     ConnectionLock,
     ChannelLock,
 

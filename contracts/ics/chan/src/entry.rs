@@ -7,6 +7,7 @@ use ckb_ics_axon::handler::{
 use ckb_ics_axon::message::{Envelope, MsgType};
 use ckb_ics_axon::{ChannelArgs, ConnectionArgs};
 use ckb_standalone_types::prelude::Entity;
+use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
@@ -43,18 +44,18 @@ pub fn main() -> Result<()> {
     }
 
     let old_bytes = old_cell_data.to_opt().unwrap();
-    let old_slice = old_bytes.raw_data();
-    if keccak256(&old_slice) != expected_input_hash {
+    let old_slice = old_bytes.as_slice();
+    if keccak256(old_slice) != expected_input_hash {
         return Err(Error::ChannelHashUnmatch);
     }
 
     let new_bytes = new_cell_data.to_opt().unwrap();
-    let new_slice = new_bytes.raw_data();
-    if keccak256(&new_slice) != expected_output_hash {
+    let new_slice = new_bytes.as_slice();
+    if keccak256(new_slice) != expected_output_hash {
         return Err(Error::ChannelHashUnmatch);
     }
 
-    verify(client, envelope, &old_slice, &new_slice)
+    verify(client, envelope, old_slice, new_slice)
 }
 
 fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) -> Result<()> {
@@ -77,20 +78,20 @@ fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) 
 
             let new_lock =
                 hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ConnectionLock)?;
-            let new_lock_args = new_lock.args().raw_data();
-            let new_connection_args =
-                ConnectionArgs::from_slice(&new_lock_args).map_err(|_| Error::ConnectionLock)?;
+            let new_lock_args = new_lock.args();
+            let new_connection_args = ConnectionArgs::from_slice(new_lock_args.as_slice())
+                .map_err(|_| Error::ConnectionLock)?;
 
             let old_lock =
                 hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ConnectionLock)?;
-            let old_lock_args = old_lock.args().raw_data();
-            let old_connection_args =
-                ConnectionArgs::from_slice(&old_lock_args).map_err(|_| Error::ConnectionLock)?;
+            let old_lock_args = old_lock.args();
+            let old_connection_args = ConnectionArgs::from_slice(old_lock_args.as_slice())
+                .map_err(|_| Error::ConnectionLock)?;
 
             let channel_lock = hl::load_cell_lock(1, Source::Output)?;
-            let channel_lock_args = channel_lock.args().raw_data();
-            let channel_args =
-                ChannelArgs::from_slice(&channel_lock_args).map_err(|_| Error::ChannelLock)?;
+            let channel_lock_args = channel_lock.args();
+            let channel_args = ChannelArgs::from_slice(channel_lock_args.as_slice())
+                .map_err(|_| Error::ChannelLock)?;
 
             handle_channel_open_init_and_try(
                 client,
@@ -108,9 +109,9 @@ fn verify(client: Client, envelope: Envelope, old_data: &[u8], new_data: &[u8]) 
             let old_channel: IbcChannel = decode(old_data).map_err(|_| Error::ChannelEncoding)?;
             let new_channel: IbcChannel = decode(new_data).map_err(|_| Error::ChannelEncoding)?;
             let new_lock = hl::load_cell_lock(0, Source::Output).map_err(|_| Error::ChannelLock)?;
-            let new_lock_args = new_lock.args().raw_data();
-            let new_channel_args =
-                ChannelArgs::from_slice(&new_lock_args).map_err(|_| Error::ChannelLock)?;
+            let new_lock_args = new_lock.args();
+            let new_channel_args = ChannelArgs::from_slice(new_lock_args.as_slice())
+                .map_err(|_| Error::ChannelLock)?;
 
             let old_lock = hl::load_cell_lock(0, Source::Input).map_err(|_| Error::ChannelLock)?;
             let old_lock_args = old_lock.args();
@@ -140,27 +141,32 @@ fn keccak256(slice: &[u8]) -> [u8; 32] {
 
 #[inline]
 fn load_envelope() -> Result<Envelope> {
-    let witness_len = hl::load_transaction()?.witnesses().len();
+    let witness_len = {
+        if let Err(SysError::LengthNotEnough(len)) = hl::load_witness_args(99, Source::Input) {
+            len
+        } else {
+            return Err(Error::WitnessTooMany);
+        }
+    };
     let last_witness = hl::load_witness_args(witness_len - 1, Source::Input)?;
     let envelope_data = last_witness.output_type();
     if envelope_data.is_none() {
         return Err(Error::WitnessIsIncorrect);
     }
     let envelope_bytes = envelope_data.to_opt().unwrap();
-    let envelope_slice = &envelope_bytes.raw_data();
+    let envelope_slice = envelope_bytes.as_slice();
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
 }
 
 fn load_client() -> Result<Client> {
-    let metadata =
-        hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::FailedToLoadClientCellData)?;
+    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
     let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
-        .map_err(|_| Error::FailedToLoadClientTypeScript)?
+        .map_err(|_| Error::LoadCellDataErr)?
         .unwrap();
-    let client_data = metadata_type_script.args().raw_data();
-    let client_id: [u8; 32] = client_data
-        .as_ref()
+    let client_id: [u8; 32] = metadata_type_script
+        .args()
+        .as_slice()
         .try_into()
-        .map_err(|_| Error::FailedToLoadClientId)?;
-    Client::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
+        .map_err(|_| Error::LoadCellDataErr)?;
+    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }
