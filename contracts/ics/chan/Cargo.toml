@@ -8,7 +8,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "029897a"}
+ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "3335011"}
 rlp ={ version = "0.5.2", default-features = false}
 ckb-standalone-types ={ version = "0.1.2", default-features = false}
 tiny-keccak = {version = "2.0.2", features = ["keccak"]}
@@ -16,7 +16,7 @@ axon-client = {version = "*", path = "../axon_client"}
 
 [features]
 default = []
-debugging = []
+debugging = ["axon-client/debugging"]
 
 [profile.release]
 overflow-checks = true
