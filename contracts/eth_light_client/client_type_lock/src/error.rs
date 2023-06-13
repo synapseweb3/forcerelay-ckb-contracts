@@ -1,112 +1,125 @@
 use core::result;
 
 use ckb_std::error::SysError;
-use eth_light_client_in_ckb_verification::error::ProofUpdateError;
+use eth_light_client_in_ckb_verification::error::{
+    ClientBootstrapError, ClientUpdateError, SyncCommitteeUpdateError,
+};
 
 pub type Result<T> = result::Result<T, Error>;
 
-pub enum Error {
+#[repr(i8)]
+pub enum InternalError {
     // 0x01 ~ 0x0f: Errors from SDK, or other system errors.
-    IndexOutOfBound,
+    IndexOutOfBound = 0x01,
     ItemMissing,
     LengthNotEnough,
     Encoding,
     UnknownSysError,
 
-    // 0x10 ~ 0x4f: Errors in current crate.
-    UnknownOperation,
-    OnlyOneInputWithCurrentType,
-
-    CreateNotEnoughCells,
+    // 0x10 ~ 0x1f: Errors before doing operations.
+    UnknownOperation = 0x10,
+    // 0x20 ~ 0x37: Errors when do create.
+    CreateNotEnoughCells = 0x20,
     CreateShouldBeOrdered,
     CreateCellsCountNotMatched,
     CreateIncorrectUniqueId,
     CreateBadClientInfoCellData,
     CreateClientInfoIndexShouldBeZero,
-    CreateClientInfoMinimalUpdatesCountShouldNotBeZero,
-    CreateBadClientCellData,
+    CreateClientInfoMinimalHeadersCountShouldNotBeZero,
     CreateWitnessIsNotExisted,
+    CreateBadClientCellData,
     CreateNewClientIsIncorrect,
-
-    UpdateInputClientInfoCellNotFound,
-    UpdateInputClientCellNotFound,
-    UpdateOutputClientInfoCellNotFound,
-    UpdateOutputClientCellNotFound,
-    UpdateClientInfoMinimalUpdatesCountChanged,
-    UpdateClientInfoNewLastIdIsIncorrect,
-    UpdateClientInputLastIdIsIncorrect,
-    UpdateCellDepLastIdIsIncorrect,
-    UpdateMoreThanOneCellDepsWithCurrentType,
-    UpdateCellDepClientCellNotFound,
-    UpdateUpdatesIsNotEnough,
-    UpdateWitnessIsNotExisted,
-    UpdateNewClientIsIncorrect,
-
-    DestroyNotEnoughCells,
-
-    // 0x50 ~ 0x7f: Errors when apply proof update.
-    ProofUpdate(ProofUpdateError),
+    CreateBadClientSyncCommitteeCellData,
+    CreateNewSyncCommitteeIsIncorrect,
+    // 0x38 ~ 0x3f: Errors when do destroy.
+    DestroyNotEnoughCells = 0x3f,
+    // 0x40 ~ 0x4f: Errors when update client.
+    UpdateClientInputInfoNotFound = 0x40,
+    UpdateClientInputClientNotFound,
+    UpdateClientInputClientIdIsMismatch,
+    UpdateClientOutputInfoNotFound,
+    UpdateClientOutputClientNotFound,
+    UpdateClientInfoChanged,
+    UpdateClientCellDepsTooMany,
+    UpdateClientCellDepsNotEnough,
+    UpdateClientCellDepClientNotFound,
+    UpdateClientCellDepSyncCommitteeNotFound,
+    UpdateClientCellDepClientIdIsMismatch,
+    UpdateClientWitnessIsNotExisted,
+    UpdateClientHeadersNotEnough,
+    // 0x50 ~ 0x5f: Errors when update sync committee.
+    UpdateSyncCommitteeInputSyncCommitteeNotFound = 0x50,
+    UpdateSyncCommitteeOutputSyncCommitteeNotFound,
+    UpdateSyncCommitteeCellDepsTooMany,
+    UpdateSyncCommitteeCellDepsNotEnough,
+    UpdateSyncCommitteeCellDepInfoNotFound,
+    UpdateSyncCommitteeCellDepClientNotFound,
+    UpdateSyncCommitteeCellDepSyncCommitteeNotFound,
+    UpdateSyncCommitteeCellDepClientIsNotLatest,
+    UpdateSyncCommitteeCellDepSyncCommitteeIsNotOldest,
+    UpdateSyncCommitteeWitnessIsNotExisted,
 }
 
-impl From<SysError> for Error {
+pub enum Error {
+    // 0x01 ~ 0x5f: Errors that not from external crates.
+    Internal(InternalError),
+    // 0x60 ~ 0x7f: Errors when bootstrap or apply the update.
+    //
+    // Different steps may have same error codes.
+    ClientBootstrap(ClientBootstrapError),
+    ClientUpdate(ClientUpdateError),
+    SyncCommitteeUpdate(SyncCommitteeUpdateError),
+}
+
+impl From<SysError> for InternalError {
     fn from(err: SysError) -> Self {
-        use SysError::*;
         match err {
-            IndexOutOfBound => Self::IndexOutOfBound,
-            ItemMissing => Self::ItemMissing,
-            LengthNotEnough(_) => Self::LengthNotEnough,
-            Encoding => Self::Encoding,
-            Unknown(_) => Self::UnknownSysError,
+            SysError::IndexOutOfBound => Self::IndexOutOfBound,
+            SysError::ItemMissing => Self::ItemMissing,
+            SysError::LengthNotEnough(_) => Self::LengthNotEnough,
+            SysError::Encoding => Self::Encoding,
+            SysError::Unknown(_) => Self::UnknownSysError,
         }
     }
 }
 
-impl From<ProofUpdateError> for Error {
-    fn from(err: ProofUpdateError) -> Self {
-        Self::ProofUpdate(err)
+impl From<SysError> for Error {
+    fn from(err: SysError) -> Self {
+        Into::<InternalError>::into(err).into()
+    }
+}
+
+impl From<InternalError> for Error {
+    fn from(err: InternalError) -> Self {
+        Self::Internal(err)
+    }
+}
+
+impl From<ClientBootstrapError> for Error {
+    fn from(err: ClientBootstrapError) -> Self {
+        Self::ClientBootstrap(err)
+    }
+}
+
+impl From<ClientUpdateError> for Error {
+    fn from(err: ClientUpdateError) -> Self {
+        Self::ClientUpdate(err)
+    }
+}
+
+impl From<SyncCommitteeUpdateError> for Error {
+    fn from(err: SyncCommitteeUpdateError) -> Self {
+        Self::SyncCommitteeUpdate(err)
     }
 }
 
 impl From<Error> for i8 {
     fn from(err: Error) -> Self {
         match err {
-            Error::IndexOutOfBound => 0x01,
-            Error::ItemMissing => 0x02,
-            Error::LengthNotEnough => 0x03,
-            Error::Encoding => 0x04,
-            Error::UnknownSysError => 0x0f,
-
-            Error::UnknownOperation => 0x10,
-            Error::OnlyOneInputWithCurrentType => 0x11,
-
-            Error::CreateNotEnoughCells => 0x20,
-            Error::CreateShouldBeOrdered => 0x21,
-            Error::CreateCellsCountNotMatched => 0x22,
-            Error::CreateIncorrectUniqueId => 0x23,
-            Error::CreateBadClientInfoCellData => 0x24,
-            Error::CreateClientInfoIndexShouldBeZero => 0x25,
-            Error::CreateClientInfoMinimalUpdatesCountShouldNotBeZero => 0x26,
-            Error::CreateBadClientCellData => 0x27,
-            Error::CreateWitnessIsNotExisted => 0x2e,
-            Error::CreateNewClientIsIncorrect => 0x2f,
-
-            Error::UpdateInputClientInfoCellNotFound => 0x30,
-            Error::UpdateInputClientCellNotFound => 0x31,
-            Error::UpdateOutputClientInfoCellNotFound => 0x32,
-            Error::UpdateOutputClientCellNotFound => 0x33,
-            Error::UpdateClientInfoMinimalUpdatesCountChanged => 0x34,
-            Error::UpdateClientInfoNewLastIdIsIncorrect => 0x35,
-            Error::UpdateClientInputLastIdIsIncorrect => 0x36,
-            Error::UpdateCellDepLastIdIsIncorrect => 0x37,
-            Error::UpdateMoreThanOneCellDepsWithCurrentType => 0x38,
-            Error::UpdateCellDepClientCellNotFound => 0x39,
-            Error::UpdateUpdatesIsNotEnough => 0x3d,
-            Error::UpdateWitnessIsNotExisted => 0x3e,
-            Error::UpdateNewClientIsIncorrect => 0x3f,
-
-            Error::DestroyNotEnoughCells => 0x40,
-
-            Error::ProofUpdate(e) => 0x50 + e as i8,
+            Error::Internal(e) => e as i8,
+            Error::ClientBootstrap(e) => 0x60 + e as i8,
+            Error::ClientUpdate(e) => 0x60 + e as i8,
+            Error::SyncCommitteeUpdate(e) => 0x60 + e as i8,
         }
     }
 }

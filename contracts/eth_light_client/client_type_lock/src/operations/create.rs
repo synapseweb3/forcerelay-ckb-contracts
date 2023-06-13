@@ -1,78 +1,119 @@
 use ckb_std::{ckb_constants::Source, error::SysError, high_level as hl};
 use eth_light_client_in_ckb_verification::types::{
-    core::Client,
-    packed::{ClientInfoReader, ClientReader, ClientTypeArgsReader, ProofUpdateReader},
+    packed::{
+        ClientBootstrapReader, ClientInfoReader, ClientReader, ClientSyncCommitteeReader,
+        ClientTypeArgsReader,
+    },
     prelude::*,
 };
 
 use crate::{
-    error::{Error, Result},
+    error::{InternalError, Result},
     utils,
 };
 
-pub(crate) fn create_client_cells(indexes: &[usize]) -> Result<()> {
-    if indexes.len() < 2 {
-        return Err(Error::CreateNotEnoughCells);
+pub(crate) fn create_cells(indexes: &[usize]) -> Result<()> {
+    if indexes.len() < 1 + 1 + 2 {
+        return Err(InternalError::CreateNotEnoughCells.into());
     }
-    if indexes.iter().enumerate().any(|(i, val)| i != *val) {
-        return Err(Error::CreateShouldBeOrdered);
+    if indexes.windows(2).any(|pair| pair[0] + 1 != pair[1]) {
+        return Err(InternalError::CreateShouldBeOrdered.into());
     }
-    let client_type_args = {
-        let script = hl::load_script()?;
-        let script_args = script.args();
-        let script_args_slice = script_args.as_reader().raw_data();
-        ClientTypeArgsReader::from_slice(script_args_slice)
-            .map_err(|_| SysError::Encoding)?
-            .unpack()
+    // Checks args of the client type script, then returns the clients count;
+    let clients_count = {
+        let client_type_args = {
+            let script = hl::load_script()?;
+            let script_args = script.args();
+            let script_args_slice = script_args.as_reader().raw_data();
+            ClientTypeArgsReader::from_slice(script_args_slice)
+                .map_err(|_| SysError::Encoding)?
+                .unpack()
+        };
+        let clients_count = usize::from(client_type_args.clients_count);
+        let cells_count = 1 + clients_count + 2;
+        if indexes.len() != cells_count {
+            return Err(InternalError::CreateCellsCountNotMatched.into());
+        }
+        let type_id = utils::calculate_type_id(indexes.len())?;
+        if type_id != client_type_args.type_id.as_bytes() {
+            return Err(InternalError::CreateIncorrectUniqueId.into());
+        }
+        clients_count
     };
-    if indexes.len() != client_type_args.cells_count as usize {
-        return Err(Error::CreateCellsCountNotMatched);
-    }
-    let type_id = utils::calculate_type_id(indexes.len())?;
-    if type_id != client_type_args.type_id.as_bytes() {
-        return Err(Error::CreateIncorrectUniqueId);
-    }
-
-    let client_cells_count = indexes.len() - 1;
-
-    let output_data = hl::load_cell_data(client_cells_count, Source::Output)?;
-    let packed_actual_info = ClientInfoReader::from_slice(&output_data)
-        .map_err(|_| Error::CreateBadClientInfoCellData)?;
-    debug!("actual new client info {packed_actual_info}");
-    let actual_info = packed_actual_info.unpack();
-    if actual_info.last_id != 0 {
-        return Err(Error::CreateClientInfoIndexShouldBeZero);
-    }
-    if actual_info.minimal_updates_count == 0 {
-        return Err(Error::CreateClientInfoMinimalUpdatesCountShouldNotBeZero);
-    }
-
-    let witness_args = hl::load_witness_args(0, Source::Output)?;
-    let mut expected_client = if let Some(args) = witness_args.input_type().to_opt() {
-        let data = args.raw_data();
-        let proof_update = ProofUpdateReader::from_slice(&data).map_err(|_| SysError::Encoding)?;
-        debug!(
-            "packed proof update size = {}",
-            proof_update.as_slice().len()
-        );
-        Client::new_from_packed_proof_update(proof_update)?
-    } else {
-        return Err(Error::CreateWitnessIsNotExisted);
-    };
-    debug!("expected new client (id=0) = {}", expected_client.pack());
-
-    for index in 0..client_cells_count {
-        debug!("check client cell (id={index})");
+    // First cell is the client info cell.
+    let mut index = indexes[0];
+    {
+        debug!("check client info cell (index={index})");
         let output_data = hl::load_cell_data(index, Source::Output)?;
-        let actual =
-            ClientReader::from_slice(&output_data).map_err(|_| Error::CreateBadClientCellData)?;
-        debug!("actual new client {actual}");
+        let packed_info = ClientInfoReader::from_slice(&output_data)
+            .map_err(|_| InternalError::CreateBadClientInfoCellData)?;
+        debug!("actual client info cell: {packed_info}");
+        let info = packed_info.unpack();
+        if info.last_client_id != 0 {
+            return Err(InternalError::CreateClientInfoIndexShouldBeZero.into());
+        }
+        if info.minimal_headers_count == 0 {
+            return Err(InternalError::CreateClientInfoMinimalHeadersCountShouldNotBeZero.into());
+        }
+    }
+    // Gets the client bootstrap from the witness.
+    let client_bootstrap = {
+        let witness_args = hl::load_witness_args(index, Source::Output)?;
+        if let Some(args) = witness_args.input_type().to_opt() {
+            ClientBootstrapReader::from_slice(&args.raw_data())
+                .map_err(|_| SysError::Encoding)?
+                .unpack()
+        } else {
+            return Err(InternalError::CreateWitnessIsNotExisted.into());
+        }
+    };
+    // Gets the new client from the client bootstrap.
+    let mut expected_client = client_bootstrap.header.initialize_client();
+    debug!("expected client cell (id=0): {}", expected_client.pack());
+    // Next `clients_count` cells are the client cells;
+    index += 1;
+    for _id in 0..clients_count {
+        debug!("check client cell (index={index}, id={_id})");
+        let output_data = hl::load_cell_data(index, Source::Output)?;
+        let actual = ClientReader::from_slice(&output_data)
+            .map_err(|_| InternalError::CreateBadClientCellData)?;
+        debug!("actual client cell: {actual}");
         let expected = expected_client.pack();
         if actual.as_slice() != expected.as_slice() {
-            return Err(Error::CreateNewClientIsIncorrect);
+            return Err(InternalError::CreateNewClientIsIncorrect.into());
         }
         expected_client.id += 1;
+        index += 1;
     }
+    // Last 2 cells are the client sync committee cells.
+    debug!("check 1st sync committee cell (index={index})");
+    let output_data = hl::load_cell_data(index, Source::Output)?;
+    let packed_sync_committee = ClientSyncCommitteeReader::from_slice(&output_data)
+        .map_err(|_| InternalError::CreateBadClientSyncCommitteeCellData)?;
+    debug!(
+        "actual 1st sync committee: period: {}, pubkeys-length: {}, aggregate_pubkey: {}",
+        packed_sync_committee.period(),
+        packed_sync_committee.data().pubkeys().len(),
+        packed_sync_committee.data().aggregate_pubkey()
+    );
+    {
+        // The two client sync committee cells should be the same as each other.
+        index += 1;
+        debug!("check 2nd sync committee cell (index={index})");
+        let output_data = hl::load_cell_data(index, Source::Output)?;
+        let packed_sync_committee_copied = ClientSyncCommitteeReader::from_slice(&output_data)
+            .map_err(|_| InternalError::CreateBadClientSyncCommitteeCellData)?;
+        debug!(
+            "actual 2nd sync committee: {{ period: {}, pubkeys-length: {}, aggregate_pubkey: {} }}",
+            packed_sync_committee_copied.period(),
+            packed_sync_committee_copied.data().pubkeys().len(),
+            packed_sync_committee_copied.data().aggregate_pubkey()
+        );
+        if packed_sync_committee.as_slice() != packed_sync_committee_copied.as_slice() {
+            return Err(InternalError::CreateBadClientSyncCommitteeCellData.into());
+        }
+    }
+    client_bootstrap.verify_packed_client_sync_committee(packed_sync_committee)?;
 
     Ok(())
 }

@@ -7,13 +7,15 @@ pub type Result<T> = result::Result<T, Error>;
 
 #[repr(i8)]
 pub enum Error {
-    IndexOutOfBound = 1,
+    // 0x01 ~ 0x0f: Errors from SDK, or other system errors.
+    IndexOutOfBound = 0x01,
     ItemMissing,
     LengthNotEnough,
     Encoding,
     UnknownSysError,
 
-    IncorrectArgs,
+    // 0x10 ~ 0x2f: Errors in current crate.
+    IncorrectArgs = 0x10,
     ClientCellDepIsNotExisted,
     BinCellDepIsNotExisted,
 }
