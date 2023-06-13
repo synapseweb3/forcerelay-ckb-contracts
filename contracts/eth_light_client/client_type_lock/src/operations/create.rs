@@ -61,11 +61,6 @@ pub(crate) fn create_client_cells(indexes: &[usize]) -> Result<()> {
     };
     debug!("expected new client (id=0) = {}", expected_client.pack());
 
-    let actual_updates_count = expected_client.maximal_slot - expected_client.minimal_slot + 1;
-    if actual_updates_count < u64::from(actual_info.minimal_updates_count) {
-        return Err(Error::CreateUpdatesIsNotEnough);
-    }
-
     for index in 0..client_cells_count {
         debug!("check client cell (id={index})");
         let output_data = hl::load_cell_data(index, Source::Output)?;

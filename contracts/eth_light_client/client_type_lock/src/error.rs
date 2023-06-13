@@ -25,7 +25,6 @@ pub enum Error {
     CreateClientInfoIndexShouldBeZero,
     CreateClientInfoMinimalUpdatesCountShouldNotBeZero,
     CreateBadClientCellData,
-    CreateUpdatesIsNotEnough,
     CreateWitnessIsNotExisted,
     CreateNewClientIsIncorrect,
 
@@ -88,7 +87,6 @@ impl From<Error> for i8 {
             Error::CreateClientInfoIndexShouldBeZero => 0x25,
             Error::CreateClientInfoMinimalUpdatesCountShouldNotBeZero => 0x26,
             Error::CreateBadClientCellData => 0x27,
-            Error::CreateUpdatesIsNotEnough => 0x2d,
             Error::CreateWitnessIsNotExisted => 0x2e,
             Error::CreateNewClientIsIncorrect => 0x2f,
 
