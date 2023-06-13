@@ -12,6 +12,7 @@ use ckb_standalone_types::prelude::Entity;
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
 
+use ckb_std::error::SysError;
 use ckb_std::{ckb_constants::Source, high_level as hl};
 
 use crate::error::{Error, Result};
@@ -133,32 +134,39 @@ fn load_and_validate_channel_from_idx(
     }
 
     let lock = hl::load_cell_lock(idx, source)?;
-    let lock_args = lock.args().raw_data();
-    let channel_args = ChannelArgs::from_slice(&lock_args).map_err(|_| Error::ChannelLock)?;
+    let lock_args = lock.args();
+    let channel_args =
+        ChannelArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::ChannelLock)?;
 
     let bytes = cell_data.to_opt().unwrap();
-    let slice = bytes.raw_data();
+    let slice = bytes.as_slice();
 
     let data = hl::load_cell_data(0, source)?;
     let expected_hash: [u8; 32] = data.try_into().map_err(|_| Error::ChannelHashUnmatch)?;
 
-    if keccak256(&slice) != expected_hash {
+    if keccak256(slice) != expected_hash {
         return Err(Error::ChannelHashUnmatch);
     }
-    let channel = decode_channel_cell(&slice)?;
+    let channel = decode_channel_cell(slice)?;
     Ok((channel, channel_args))
 }
 
 #[inline]
 fn load_envelope() -> Result<Envelope> {
-    let witness_len = hl::load_transaction()?.witnesses().len();
+    let witness_len = {
+        if let Err(SysError::LengthNotEnough(len)) = hl::load_witness_args(99, Source::Input) {
+            len
+        } else {
+            return Err(Error::WitnessTooMany);
+        }
+    };
     let last_witness = hl::load_witness_args(witness_len - 1, Source::Input)?;
     let envelope_data = last_witness.output_type();
     if envelope_data.is_none() {
         return Err(Error::WitnessIsIncorrect);
     }
     let envelope_bytes = envelope_data.to_opt().unwrap();
-    let envelope_slice = &envelope_bytes.raw_data();
+    let envelope_slice = envelope_bytes.as_slice();
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
 }
 
@@ -168,13 +176,7 @@ fn load_and_validate_ibc_packet_from_idx(
     source: Source,
 ) -> Result<(IbcPacket, PacketArgs)> {
     let witness = hl::load_witness_args(idx, source)?;
-
-    let cell_data = if source == Source::Input {
-        witness.input_type()
-    } else {
-        witness.output_type()
-    };
-
+    let cell_data = witness.input_type();
     if cell_data.is_none() {
         return Err(Error::WitnessIsNotExisted);
     }
@@ -189,9 +191,10 @@ fn load_and_validate_ibc_packet_from_idx(
         return Err(Error::ChannelHashUnmatch);
     }
 
-    let lock = hl::load_cell_lock(idx, source)?;
-    let lock_args = lock.args().raw_data();
-    let packet_args = PacketArgs::from_slice(&lock_args).map_err(|_| Error::PacketLock)?;
+    let lock = hl::load_cell_lock(idx, Source::Output)?;
+    let lock_args = lock.args();
+    let packet_args =
+        PacketArgs::from_slice(lock_args.as_slice()).map_err(|_| Error::PacketLock)?;
     let packet = decode_ibc_packet(slice)?;
     Ok((packet, packet_args))
 }
@@ -215,15 +218,14 @@ fn keccak256(slice: &[u8]) -> [u8; 32] {
 }
 
 fn load_client() -> Result<Client> {
-    let metadata =
-        hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::FailedToLoadClientCellData)?;
+    let metadata = hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::LoadCellDataErr)?;
     let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
-        .map_err(|_| Error::FailedToLoadClientTypeScript)?
+        .map_err(|_| Error::LoadCellDataErr)?
         .unwrap();
-    let client_data = metadata_type_script.args().raw_data();
-    let client_id: [u8; 32] = client_data
-        .as_ref()
+    let client_id: [u8; 32] = metadata_type_script
+        .args()
+        .as_slice()
         .try_into()
-        .map_err(|_| Error::FailedToLoadClientId)?;
-    Client::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
+        .map_err(|_| Error::LoadCellDataErr)?;
+    Client::new(client_id, &metadata).map_err(|_| Error::LoadCellDataErr)
 }
