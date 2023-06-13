@@ -1,6 +1,6 @@
 [package]
 name = "ibc-ckb_contracts-eth_light_client-client_type_lock"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
