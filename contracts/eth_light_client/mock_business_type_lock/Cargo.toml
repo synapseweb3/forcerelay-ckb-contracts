@@ -1,6 +1,6 @@
 [package]
 name = "ibc-ckb_contracts-eth_light_client-mock_business_type_lock"
-version = "0.2.0-alpha"
+version = "0.2.0"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-eth_light_client_in_ckb-verification = { version = "0.2.0-alpha", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", rev = "4366773" }
+eth_light_client_in_ckb-verification = { version = "0.2.0", default-features = false, git = "https://github.com/synapseweb3/eth-light-client-in-ckb", tag = "v0.2.0" }
 
 [features]
 default = []

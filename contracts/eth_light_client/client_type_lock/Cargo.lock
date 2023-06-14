@@ -232,8 +232,8 @@ dependencies = [
 
 [[package]]
 name = "eth_light_client_in_ckb-verification"
-version = "0.2.0-alpha"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=4366773#436677306206fe0c00bf9df72148e6bd86efbc53"
+version = "0.2.0"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.2.0#5574b6636303e68006c4d7953ea7aea09e2a8967"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -310,7 +310,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ibc-ckb_contracts-eth_light_client-client_type_lock"
-version = "0.2.0-alpha"
+version = "0.2.0"
 dependencies = [
  "blake2b-rs",
  "ckb-std",
