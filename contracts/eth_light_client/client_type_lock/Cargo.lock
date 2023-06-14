@@ -232,8 +232,8 @@ dependencies = [
 
 [[package]]
 name = "eth_light_client_in_ckb-verification"
-version = "0.2.0"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.2.0#5574b6636303e68006c4d7953ea7aea09e2a8967"
+version = "0.2.1"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.2.1#5e8549d20f8c91da7362cb1c87823c53fd7cd205"
 dependencies = [
  "ckb-merkle-mountain-range",
  "eth2_hashing",
@@ -310,7 +310,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ibc-ckb_contracts-eth_light_client-client_type_lock"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "blake2b-rs",
  "ckb-std",
@@ -374,9 +374,9 @@ dependencies = [
 
 [[package]]
 name = "molecule"
-version = "0.7.5"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4fd9767ab5e5f2ea40f71ff4c8bdb633c50509052e093c2fdd0e390a749dfa3"
+checksum = "edc8276c02a006bddad7d1c28c1a88f30421e1b5f0ba0ca96ceb8077c7d20c01"
 dependencies = [
  "cfg-if",
 ]
