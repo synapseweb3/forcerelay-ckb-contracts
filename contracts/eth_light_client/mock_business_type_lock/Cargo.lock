@@ -294,7 +294,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ibc-ckb_contracts-eth_light_client-mock_business_type_lock"
-version = "0.2.0"
+version = "0.3.0-alpha"
 dependencies = [
  "ckb-std",
  "eth_light_client_in_ckb-verification",
