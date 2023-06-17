@@ -17,16 +17,20 @@ pub enum Error {
     MsgEncoding,
 
     WitnessIsIncorrect,
-    WitnessTooMany,
+    WitnessInputOrOutputIsNone,
+    CellDataUnmatch,
 
-    LoadScriptErr,
-    LoadCellDataErr,
+    FailedToLoadClientCellData,
+    FailedToLoadClientTypeScript,
+    FailedToLoadClientId,
+    FailedToCreateClient,
 
     UnexpectedMsg,
     ConnectionProofInvalid,
     ConnectionHashUnmatch,
     ClientCreateWrongClientId,
     ConnectionLock,
+    ClientCreateWrongConnectionCell,
 }
 
 impl From<SysError> for Error {
