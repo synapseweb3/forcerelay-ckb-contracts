@@ -4,7 +4,7 @@ version = "0.3.0-alpha"
 authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2021"
 license = "MIT"
-description = "An IBC implementation of ETH light client in CKB contract (client type lock part)."
+description = "An implementation of ETH light client in CKB contract (client type lock part)."
 homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
