@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use ibc_ckb_contracts_test_utils::{
     ckb::{
         script::ScriptVersion,
@@ -12,33 +10,45 @@ use ibc_ckb_contracts_test_utils::{
     misc, Context, Verifier,
 };
 
-use super::super::{utils, CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR};
+use super::super::{utils, CLIENT_TYPE_LOCK_CONTRACT};
 use crate::{mock_contracts::CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn destroy_case_1() {
-    let param = DestroyParameter {
-        case_id: 1,
+fn testcase_just_right() {
+    let param = Parameter {
         clients_count: 3,
-        client_filename: "client-6268480_6268543.data",
+        actual_cells_count: 6,
     };
     destroy(param);
 }
 
-struct DestroyParameter {
-    case_id: usize,
-    clients_count: u8,
-    client_filename: &'static str,
+#[test]
+#[should_panic]
+fn testcase_one_less() {
+    let param = Parameter {
+        clients_count: 3,
+        actual_cells_count: 7,
+    };
+    destroy(param);
 }
 
-fn destroy(param: DestroyParameter) {
+#[test]
+#[should_panic]
+fn testcase_one_more() {
+    let param = Parameter {
+        clients_count: 3,
+        actual_cells_count: 5,
+    };
+    destroy(param);
+}
+
+struct Parameter {
+    clients_count: u8,
+    actual_cells_count: u8,
+}
+
+fn destroy(param: Parameter) {
     crate::setup();
-
-    let minimal_updates_count = 64;
-
-    let case_dir = format!("case-{}", param.case_id);
-    let root_dir = Path::new(DATA_DIR).join("client_type_lock").join(case_dir);
-    let mut client = misc::load_data_from_file(&root_dir, param.client_filename);
 
     let mut context = Context::new();
     let script_version = ScriptVersion::latest();
@@ -66,38 +76,28 @@ fn destroy(param: DestroyParameter) {
         .args(lock_args.pack())
         .build();
 
-    let client_type_args = {
-        let cells_count = param.clients_count + 1;
-        utils::randomize_client_type_args(cells_count)
-    };
+    let client_type_args = utils::randomize_client_type_args(param.clients_count);
     let type_script = packed::Script::new_builder()
         .hash_type(ScriptHashType::Type.into())
         .code_hash(deployed_type_contract.type_hash().unwrap())
         .args(client_type_args)
         .build();
 
-    let deployed_clients = (0..param.clients_count)
-        .map(|id| {
-            client[0] = id;
-            let data = client.clone().into();
+    let deployed_cells = (0..param.actual_cells_count)
+        .map(|byte| {
+            let data = vec![byte].into();
             context.deploy(data, lock_script.clone(), Some(type_script.clone()), None)
         })
         .collect::<Vec<_>>();
 
-    let deployed_client_info = {
-        let client_info = utils::build_client_info(0, minimal_updates_count);
-        context.deploy(client_info.unpack(), lock_script, Some(type_script), None)
-    };
-
     let transaction = {
-        let info_capacity: Capacity = deployed_client_info.cell_output().capacity().unpack();
-        let total_capacity = deployed_clients
+        let total_capacity = deployed_cells
             .iter()
-            .fold(info_capacity, |total, client| {
-                let added: Capacity = client.cell_output().capacity().unpack();
+            .fold(Capacity::shannons(0), |total, cell| {
+                let added: Capacity = cell.cell_output().capacity().unpack();
                 total.safe_add(added).unwrap()
             });
-        let output = deployed_client_info
+        let output = deployed_cells[0]
             .cell_output()
             .as_builder()
             .type_(None::<packed::Script>.pack())
@@ -106,11 +106,10 @@ fn destroy(param: DestroyParameter) {
         let mut tx_builder = TransactionBuilder::default()
             .cell_dep(deployed_lock_contract.as_cell_dep())
             .cell_dep(deployed_type_contract.as_cell_dep());
-        for client in deployed_clients {
-            tx_builder = tx_builder.input(client.as_input());
+        for cell in deployed_cells {
+            tx_builder = tx_builder.input(cell.as_input());
         }
         tx_builder
-            .input(deployed_client_info.as_input())
             .output(output)
             .output_data(Default::default())
             .build()

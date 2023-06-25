@@ -18,9 +18,7 @@
 
 ### ETH Light Client
 
-- [Client Type Lock](contracts/eth_light_client/client_type_lock)
-- [Verify Bin](contracts/eth_light_client/verify_bin)
-- [Mock Business Type Lock](contracts/eth_light_client/mock_business_type_lock)
+- [ETH Light Client](contracts/eth_light_client)
 
 ## License
 

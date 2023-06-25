@@ -1,6 +1,7 @@
-use crate::error::Result;
 use ckb_std::{ckb_constants::Source, high_level as hl};
 use eth_light_client_in_ckb_verification::types::prelude::*;
+
+use crate::error::Result;
 
 const CKB_HASH_PERSONALIZATION: &[u8] = b"ckb-default-hash";
 const BLAKE2B_LEN: usize = 32;

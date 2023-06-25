@@ -16,32 +16,67 @@ use super::super::{utils, CLIENT_TYPE_LOCK_CONTRACT, DATA_DIR};
 use crate::{mock_contracts::CAN_UPDATE_WITHOUT_OWNERSHIP_LOCK_CONTRACT, prelude::*};
 
 #[test]
-fn create_case_1() {
-    let param = CreateParameter {
-        case_id: 1,
+fn mainnet_testcase_for_altair() {
+    for slot in [3745600, 4628480, 4636640] {
+        mainnet_testcase_for_slot(slot);
+    }
+}
+
+#[test]
+fn mainnet_testcase_for_bellatrix() {
+    for slot in [4636672, 4636704, 4644864, 6201343, 6209504] {
+        mainnet_testcase_for_slot(slot);
+    }
+}
+
+#[test]
+fn mainnet_testcase_for_capella() {
+    for slot in [6209535, 6209568, 6217728] {
+        mainnet_testcase_for_slot(slot);
+    }
+}
+
+#[test]
+fn mainnet_testcase_for_others() {
+    // The test data for client update.
+    for slot in [6632736] {
+        mainnet_testcase_for_slot(slot);
+    }
+    // The test data for sync committee update.
+    for slot in [4612096, 6184960] {
+        mainnet_testcase_for_slot(slot);
+    }
+}
+
+fn mainnet_testcase_for_slot(slot: u64) {
+    let param = Parameter {
         clients_count: 3,
-        minimal_updates_count: 64,
-        client_filename: "client-6268480_6268543.data",
-        proof_update_filename: "proof_update-6268480_6268543.data",
+        minimal_headers_count: 22,
+        client_filename: format!("client-{slot:09}_{slot:09}.data"),
+        sync_committee_filename: format!("sync_committee-{slot:09}.data"),
+        client_bootstrap_filename: format!("client_bootstrap-{slot:09}.data"),
     };
     create(param);
 }
 
-struct CreateParameter {
-    case_id: usize,
+struct Parameter {
     clients_count: u8,
-    minimal_updates_count: u8,
-    client_filename: &'static str,
-    proof_update_filename: &'static str,
+    minimal_headers_count: u8,
+    client_filename: String,
+    sync_committee_filename: String,
+    client_bootstrap_filename: String,
 }
 
-fn create(param: CreateParameter) {
+fn create(param: Parameter) {
     crate::setup();
 
-    let case_dir = format!("case-{}", param.case_id);
-    let root_dir = Path::new(DATA_DIR).join("client_type_lock").join(case_dir);
-    let mut client = misc::load_data_from_file(&root_dir, param.client_filename);
-    let proof_update = misc::load_data_from_file(&root_dir, param.proof_update_filename);
+    let bootstrap_dir = Path::new(DATA_DIR)
+        .join("client_type_lock")
+        .join("bootstrap");
+    let mut client = misc::load_data_from_file(&bootstrap_dir, &param.client_filename);
+    let sync_committee = misc::load_data_from_file(&bootstrap_dir, &param.sync_committee_filename);
+    let client_bootstrap =
+        misc::load_data_from_file(&bootstrap_dir, &param.client_bootstrap_filename);
 
     let mut context = Context::new();
     let script_version = ScriptVersion::latest();
@@ -74,11 +109,9 @@ fn create(param: CreateParameter) {
     };
 
     let transaction = {
-        let client_type_args = {
-            let cells_count = param.clients_count + 1;
-            utils::build_client_type_args(&deployed_cell.as_input(), cells_count)
-        };
-        let client_info = utils::build_client_info(0, param.minimal_updates_count);
+        let client_type_args =
+            utils::build_client_type_args(&deployed_cell.as_input(), param.clients_count);
+        let client_info = utils::build_client_info(0, param.minimal_headers_count);
         let output = {
             let type_script = packed::Script::new_builder()
                 .hash_type(ScriptHashType::Type.into())
@@ -93,7 +126,7 @@ fn create(param: CreateParameter) {
         };
         let witness = {
             let input_type_args = packed::BytesOpt::new_builder()
-                .set(Some(proof_update.pack()))
+                .set(Some(client_bootstrap.pack()))
                 .build();
             let witness_args = packed::WitnessArgs::new_builder()
                 .input_type(input_type_args)
@@ -104,13 +137,19 @@ fn create(param: CreateParameter) {
             .cell_dep(deployed_lock_contract.as_cell_dep())
             .cell_dep(deployed_type_contract.as_cell_dep())
             .input(deployed_cell.as_input())
+            .output(output.clone())
+            .output_data(client_info)
             .witness(witness.pack());
         for id in 0..param.clients_count {
             client[0] = id;
             tx_builder = tx_builder.output(output.clone()).output_data(client.pack());
         }
-        tx_builder = tx_builder.output(output).output_data(client_info);
-        tx_builder.build()
+        tx_builder
+            .output(output.clone())
+            .output(output)
+            .output_data(sync_committee.pack())
+            .output_data(sync_committee.pack())
+            .build()
     };
 
     let rtx = context.resolve(transaction);

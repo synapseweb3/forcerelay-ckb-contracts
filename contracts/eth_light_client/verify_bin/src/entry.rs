@@ -5,7 +5,7 @@ use eth_light_client_in_ckb_verification::types::{
     prelude::*,
 };
 
-use crate::error::{Error, Result};
+use crate::error::{Error, InternalError, Result};
 
 const CLIENT_ARG_INDEX: usize = 0;
 const WITNESS_ARG_INDEX: usize = 1;
@@ -16,7 +16,7 @@ pub fn main() -> Result<()> {
     let argv = env::argv();
 
     if argv.len() != 2 {
-        return Err(Error::IncorrectArgc);
+        return Err(InternalError::IncorrectArgc.into());
     }
 
     let client_cell_index = load_usize_from_argv(argv, CLIENT_ARG_INDEX)?;
@@ -43,10 +43,10 @@ pub fn main() -> Result<()> {
                 .map_err(Error::FailedToVerifyTransactionProof)?;
             reader.unpack()
         } else {
-            return Err(Error::IncorrectTransactionProof);
+            return Err(InternalError::IncorrectTransactionProof.into());
         }
     } else {
-        return Err(Error::TransactionProofIsNotExisted);
+        return Err(InternalError::TransactionProofIsNotExisted.into());
     };
 
     if let Some(args) = witness_args_reader.output_type().to_opt() {
@@ -56,10 +56,10 @@ pub fn main() -> Result<()> {
                 .verify_packed_payload(reader)
                 .map_err(Error::FailedToVerifyTransactionPayload)?;
         } else {
-            return Err(Error::IncorrectTransactionPayload);
+            return Err(InternalError::IncorrectTransactionPayload.into());
         }
     } else {
-        return Err(Error::TransactionPayloadIsNotExisted);
+        return Err(InternalError::TransactionPayloadIsNotExisted.into());
     };
 
     debug!("{} DONE.", module_path!());
@@ -72,9 +72,9 @@ fn load_usize_from_argv(argv: &[env::Arg], index: usize) -> Result<usize> {
         if let Ok(value) = arg_str.parse() {
             Ok(value)
         } else {
-            Err(Error::IncorrectArgv)
+            Err(InternalError::IncorrectArgv.into())
         }
     } else {
-        Err(Error::IncorrectArgv)
+        Err(InternalError::IncorrectArgv.into())
     }
 }

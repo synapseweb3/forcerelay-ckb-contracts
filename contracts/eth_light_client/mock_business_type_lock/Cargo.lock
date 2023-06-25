@@ -12,6 +12,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "bls"
+version = "0.2.0"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
+dependencies = [
+ "ckb-blst",
+ "eth2_hashing",
+ "eth2_serde_utils",
+ "eth2_ssz",
+ "ethereum-types",
+ "hex",
+ "serde",
+ "serde_derive",
+ "tree_hash",
+ "zeroize",
+]
+
+[[package]]
 name = "buddy-alloc"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -40,6 +57,17 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "ckb-blst"
+version = "0.100.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23956c8f956fabab27aa20632fcefb1ab31f71544dab732c842064605932aea3"
+dependencies = [
+ "cc",
+ "glob",
+ "zeroize",
+]
 
 [[package]]
 name = "ckb-merkle-mountain-range"
@@ -161,7 +189,7 @@ checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
 [[package]]
 name = "eth2_hashing"
 version = "0.3.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "sha2",
 ]
@@ -169,7 +197,7 @@ dependencies = [
 [[package]]
 name = "eth2_serde_utils"
 version = "0.1.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "ethereum-types",
  "hex",
@@ -181,7 +209,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz"
 version = "0.4.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "ethereum-types",
  "itertools",
@@ -191,7 +219,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz_derive"
 version = "0.3.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -202,7 +230,7 @@ dependencies = [
 [[package]]
 name = "eth2_ssz_types"
 version = "0.2.2"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "derivative",
  "eth2_serde_utils",
@@ -216,14 +244,16 @@ dependencies = [
 
 [[package]]
 name = "eth_light_client_in_ckb-verification"
-version = "0.2.0"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?tag=v0.2.0#5574b6636303e68006c4d7953ea7aea09e2a8967"
+version = "0.3.0-alpha"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=99e8239#99e823921685616b4d224e58fa981257729fbc34"
 dependencies = [
+ "bls",
  "ckb-merkle-mountain-range",
  "eth2_hashing",
  "eth2_ssz",
  "eth2_ssz_derive",
  "eth2_ssz_types",
+ "ethereum-types",
  "merkle_proof",
  "molecule",
  "rlp",
@@ -287,6 +317,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glob"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
+
+[[package]]
 name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -294,7 +330,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "ibc-ckb_contracts-eth_light_client-mock_business_type_lock"
-version = "0.2.0"
+version = "0.3.0-alpha"
 dependencies = [
  "ckb-std",
  "eth_light_client_in_ckb-verification",
@@ -348,7 +384,7 @@ checksum = "db6d7e329c562c5dfab7a46a2afabc8b987ab9a4834c9d1ca04dc54c1546cef8"
 [[package]]
 name = "merkle_proof"
 version = "0.2.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -419,7 +455,7 @@ checksum = "7b4b9743ed687d4b4bcedf9ff5eaa7398495ae14e61cba0a295704edbc7decde"
 [[package]]
 name = "safe_arith"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 
 [[package]]
 name = "serde"
@@ -493,6 +529,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "synstructure"
+version = "0.12.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f36bdaa60a83aca3921b5259d5400cbf5e90fc51931376a9bd4a0eb79aa7210f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "unicode-xid",
+]
+
+[[package]]
 name = "tiny-keccak"
 version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -504,7 +552,7 @@ dependencies = [
 [[package]]
 name = "tree_hash"
 version = "0.4.1"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "eth2_hashing",
  "ethereum-types",
@@ -514,7 +562,7 @@ dependencies = [
 [[package]]
 name = "tree_hash_derive"
 version = "0.4.0"
-source = "git+https://github.com/synapseweb3/lighthouse?rev=2c246d6#2c246d68011f14a9ee959b8d75b1dcb5d30b2993"
+source = "git+https://github.com/synapseweb3/lighthouse?rev=be911e6#be911e6bd3f54ae84b01310b411be19e2b274634"
 dependencies = [
  "darling",
  "quote",
@@ -546,7 +594,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
 
 [[package]]
+name = "unicode-xid"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
+
+[[package]]
 name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
+name = "zeroize"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a0956f1ba7c7909bfb66c2e9e4124ab6f6482560f6628b5aaeba39207c9aad9"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44bf07cb3e50ea2003396695d58bf46bc9887a1f362260446fad6bc4e79bd36c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "synstructure",
+]
