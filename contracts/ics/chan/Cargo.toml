@@ -8,7 +8,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "e57a669"}
+ckb-ics-axon = {git = "https://github.com/synapseweb3/ckb-ics.git", rev = "efd7af5"}
 rlp ={ version = "0.5.2", default-features = false}
 ckb-standalone-types ={ version = "0.1.2", default-features = false}
 tiny-keccak = {version = "2.0.2", features = ["keccak"]}
