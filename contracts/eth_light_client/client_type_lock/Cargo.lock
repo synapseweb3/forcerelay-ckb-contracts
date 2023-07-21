@@ -81,9 +81,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-merkle-mountain-range"
-version = "0.5.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56ccb671c5921be8a84686e6212ca184cb1d7c51cadcdbfcbd1cc3f042f5dfb8"
+checksum = "d15193decfa1e0b151ce19e42d118db048459a27720fb3de7d3103c30adccb12"
 dependencies = [
  "cfg-if",
 ]
@@ -261,7 +261,7 @@ dependencies = [
 [[package]]
 name = "eth_light_client_in_ckb-verification"
 version = "0.3.0-alpha"
-source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=99e8239#99e823921685616b4d224e58fa981257729fbc34"
+source = "git+https://github.com/synapseweb3/eth-light-client-in-ckb?rev=9325266#932526684df575c4320f053e38837c88fddd6076"
 dependencies = [
  "bls",
  "ckb-merkle-mountain-range",
