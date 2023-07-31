@@ -3,6 +3,17 @@
 version = 3
 
 [[package]]
+name = "axon-client"
+version = "0.1.0"
+dependencies = [
+ "axon-tools-riscv",
+ "axon-types",
+ "ckb-ics-axon",
+ "molecule",
+ "rlp",
+]
+
+[[package]]
 name = "axon-tools-riscv"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15,6 +26,15 @@ dependencies = [
  "rlp",
  "rlp-derive",
  "tiny-keccak",
+]
+
+[[package]]
+name = "axon-types"
+version = "0.1.0"
+source = "git+https://github.com/axonweb3/axon-contract?rev=8c2338a#8c2338ad5a3b32f260b5da234536f2681bf7712b"
+dependencies = [
+ "molecule",
+ "molecule2",
 ]
 
 [[package]]
@@ -45,6 +65,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 
 [[package]]
+name = "cfg-if"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
 name = "ckb-blst"
 version = "0.100.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -58,7 +84,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=6641b0#6641b0aeb06028b6c39095a5028ad59779bbdfc1"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=61e8330#61e8330cd6a86d9976bf81ec245c6b8ba4303c9c"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -124,14 +150,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
-name = "ibc-ckb_contracts-axon-client"
-version = "0.1.0"
-dependencies = [
- "axon-tools-riscv",
- "ckb-ics-axon",
-]
-
-[[package]]
 name = "impl-rlp"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -148,6 +166,20 @@ checksum = "ebc88fc67028ae3db0c853baa36269d398d5f45b6982f95549ff5def78c935cd"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "molecule"
+version = "0.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4fd9767ab5e5f2ea40f71ff4c8bdb633c50509052e093c2fdd0e390a749dfa3"
+dependencies = [
+ "cfg-if",
+]
+
+[[package]]
+name = "molecule2"
+version = "0.1.0"
+source = "git+https://github.com/axonweb3/axon-contract?rev=8c2338a#8c2338ad5a3b32f260b5da234536f2681bf7712b"
 
 [[package]]
 name = "primitive-types"
