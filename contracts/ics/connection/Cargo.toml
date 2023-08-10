@@ -1,5 +1,5 @@
 [package]
-name = "ibc-ckb_contracts-ics-conn"
+name = "ibc-ckb_contracts-ics-connection"
 version = "0.1.0-alpha.0"
 edition = "2021"
 license = "MIT"
@@ -8,16 +8,15 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "61e8330" }
+ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "559c574" }
 rlp = { version = "0.5.2", default-features = false }
 ckb-standalone-types = { version = "0.1.2", default-features = false }
 tiny-keccak = { version = "2.0.2", features = ["keccak"] }
-
-axon-client = { version = "*", path = "../axon_client" }
+ics-base = { version = "*", path = "../base" }
 
 [features]
 default = []
-debugging = ["axon-client/debugging"]
+debugging = ["ics-base/debugging"]
 
 [profile.release]
 overflow-checks = true

@@ -2,7 +2,6 @@
 #![no_main]
 
 mod entry;
-mod error;
 
 use ckb_std::default_alloc;
 

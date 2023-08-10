@@ -12,6 +12,10 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
+    UnexpectedMsg,
+
+    PacketEncoding,
+    ChannelEncoding,
     ConnectionEncoding,
     EnvelopeEncoding,
     MsgEncoding,
@@ -25,11 +29,19 @@ pub enum Error {
     FailedToLoadClientId,
     FailedToCreateClient,
 
-    UnexpectedMsg,
     ConnectionProofInvalid,
+    ChannelProofInvalid,
+    PacketProofInvalid,
+
     ConnectionHashUnmatch,
-    ClientCreateWrongClientId,
+    ChannelHashUnmatch,
+    PacketHashUnmatch,
+
     ConnectionLock,
+    ChannelLock,
+    PacketLock,
+
+    ClientCreateWrongClientId,
     ClientCreateWrongConnectionCell,
 }
 

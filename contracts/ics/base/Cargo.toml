@@ -1,5 +1,5 @@
 [package]
-name = "axon-client"
+name = "ics-base"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
@@ -7,7 +7,8 @@ homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
-ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "61e8330" }
+ckb-std = "0.13.0"
+ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "559c574" }
 axon-tools-riscv = { version = "0.1.1", features = ["proof"] }
 axon-types = { git = "https://github.com/axonweb3/axon-contract", rev = "8c2338a" }
 rlp = { version = "0.5.2", default-features = false }

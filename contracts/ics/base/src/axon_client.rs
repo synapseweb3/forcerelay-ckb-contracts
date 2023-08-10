@@ -1,5 +1,3 @@
-#![no_std]
-
 extern crate alloc;
 use alloc::vec::Vec;
 use axon_tools_riscv::types::{AxonBlock, Proof as AxonProof, Validator};
