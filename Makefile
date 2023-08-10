@@ -57,7 +57,7 @@ lint-all-contracts:
 		for contract in ${ALL_CONTRACTS}; do \
 			echo ">>> Lint \"$${contract}\" contract ..."; \
 			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
-			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clippy --locked -- --deny warnings; cd "$${rootdir}"; \
+			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clippy --target=${RUST_TOOLCHAIN_TARGET} --locked -- --deny warnings; cd "$${rootdir}"; \
 		done; \
 		echo "[DONE] Lint all contracts."
 lint-all-contracts-in-docker:
