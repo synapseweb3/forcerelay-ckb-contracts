@@ -1,5 +1,5 @@
 [package]
-name = "ibc-ckb_contracts-ics-packet"
+name = "ibc-ckb_contracts-ics-channel"
 version = "0.1.0-alpha.0"
 edition = "2021"
 license = "MIT"
@@ -8,10 +8,7 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "ef124f9" }
-rlp = { version = "0.5.2", default-features = false }
 ckb-standalone-types = { version = "0.1.2", default-features = false }
-tiny-keccak = { version = "2.0.2", features = ["keccak"] }
 ics-base = { version = "*", path = "../base" }
 
 [features]

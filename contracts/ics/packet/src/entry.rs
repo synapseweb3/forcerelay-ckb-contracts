@@ -1,20 +1,18 @@
-use axon_client::AxonClient as Client;
-use ckb_ics_axon::handler::{
-    handle_msg_ack_inbox_packet, handle_msg_ack_outbox_packet, handle_msg_ack_packet,
-    handle_msg_recv_packet, handle_msg_send_packet, IbcChannel, IbcPacket,
-};
-use ckb_ics_axon::message::{
-    Envelope, MsgAckInboxPacket, MsgAckOutboxPacket, MsgAckPacket, MsgType,
-};
-use ckb_ics_axon::message::{MsgRecvPacket, MsgSendPacket};
-use ckb_ics_axon::{ChannelArgs, PacketArgs};
-use ckb_standalone_types::prelude::Entity;
-use rlp::decode;
-use tiny_keccak::{Hasher as _, Keccak};
-
 use ckb_std::{ckb_constants::Source, high_level as hl};
 
-use crate::error::{Error, Result};
+use ckb_ics_axon::handler::{
+    handle_msg_ack_packet, handle_msg_recv_packet, handle_msg_send_packet,
+    handle_msg_write_ack_packet, IbcChannel, IbcPacket,
+};
+use ckb_ics_axon::message::{
+    Envelope, MsgAckPacket, MsgRecvPacket, MsgSendPacket, MsgType, MsgWriteAckPacket,
+};
+use ckb_ics_axon::{ChannelArgs, PacketArgs};
+use ckb_standalone_types::prelude::Entity;
+use ics_base::axon_client::AxonClient as Client;
+use ics_base::error::{Error, Result};
+use rlp::decode;
+use tiny_keccak::{Hasher as _, Keccak};
 
 // We have these conventions in this contract:
 // - The last witnesses args's output type is the serialization of Packet Message
@@ -61,20 +59,21 @@ pub fn main() -> Result<()> {
                 old_channel_args,
                 new_channel,
                 new_channel_args,
+                None,
                 ibc_packet,
                 packet_args,
                 msg,
             )
             .map_err(|_| Error::PacketProofInvalid)
         }
-        MsgType::MsgAckOutboxPacket => {
+        MsgType::MsgWriteAckPacket => {
             let (old_ibc_packet, old_packet_args) =
                 load_and_validate_ibc_packet_from_idx(0, Source::Input)?;
             let (new_ibc_packet, new_packet_args) =
                 load_and_validate_ibc_packet_from_idx(0, Source::Output)?;
             let msg =
-                decode::<MsgAckOutboxPacket>(&envelope.content).map_err(|_| Error::MsgEncoding)?;
-            handle_msg_ack_outbox_packet(
+                decode::<MsgWriteAckPacket>(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_write_ack_packet(
                 old_ibc_packet,
                 old_packet_args,
                 new_ibc_packet,
@@ -82,13 +81,6 @@ pub fn main() -> Result<()> {
                 msg,
             )
             .map_err(|_| Error::PacketProofInvalid)
-        }
-        MsgType::MsgAckInboxPacket => {
-            let (old_ibc_packet, _packet_args) =
-                load_and_validate_ibc_packet_from_idx(0, Source::Input)?;
-            let msg =
-                decode::<MsgAckInboxPacket>(&envelope.content).map_err(|_| Error::MsgEncoding)?;
-            handle_msg_ack_inbox_packet(old_ibc_packet, msg).map_err(|_| Error::PacketProofInvalid)
         }
         MsgType::MsgAckPacket => {
             let client = load_client()?;

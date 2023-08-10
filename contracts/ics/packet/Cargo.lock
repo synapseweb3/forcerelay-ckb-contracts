@@ -3,21 +3,10 @@
 version = 3
 
 [[package]]
-name = "axon-client"
-version = "0.1.0"
-dependencies = [
- "axon-tools-riscv",
- "axon-types",
- "ckb-ics-axon",
- "molecule",
- "rlp",
-]
-
-[[package]]
 name = "axon-tools-riscv"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35fb7658d295d9375998942dfd59ce6d7729d652a10da02833f7d98e0c75c009"
+checksum = "7c837f5113835aae14bc402a7a4a9324910134544fe2f7d325b302ce0a27bfeb"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -66,9 +55,12 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.79"
+version = "1.0.82"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
+checksum = "305fe645edc1442a0fa8b6726ba61d422798d37a52e12eaecf4b022ebbb88f01"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "cfg-if"
@@ -90,7 +82,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=61e8330#61e8330cd6a86d9976bf81ec245c6b8ba4303c9c"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=ef124f9#ef124f9c0ed5b05e7b69d3b8c40c3d171082af4e"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -101,9 +93,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-standalone-types"
-version = "0.1.2"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22d7cbbdab96e6b809a102cf88bfec28795a0a3c06bfdea4abe4de89777801cd"
+checksum = "dd206470d9b270fe13f38c4c7fecabf323739f4930ea6f9b80e9490bfa750447"
 dependencies = [
  "cfg-if",
  "molecule",
@@ -180,10 +172,23 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 name = "ibc-ckb_contracts-ics-packet"
 version = "0.1.0-alpha.0"
 dependencies = [
- "axon-client",
  "ckb-ics-axon",
  "ckb-standalone-types",
  "ckb-std",
+ "ics-base",
+ "rlp",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "ics-base"
+version = "0.1.0"
+dependencies = [
+ "axon-tools-riscv",
+ "axon-types",
+ "ckb-ics-axon",
+ "ckb-std",
+ "molecule",
  "rlp",
  "tiny-keccak",
 ]
@@ -205,6 +210,12 @@ checksum = "ebc88fc67028ae3db0c853baa36269d398d5f45b6982f95549ff5def78c935cd"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "libc"
+version = "0.2.147"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 
 [[package]]
 name = "molecule"
@@ -234,18 +245,18 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.59"
+version = "1.0.66"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aeca18b86b413c660b781aa319e4e2648a3e6f9eadc9b47e9038e6fe9f3451b"
+checksum = "18fb31db3f9bddb2ea821cde30a9f70117e3f119938b5ee630b7403aa6e2ead9"
 dependencies = [
  "unicode-ident",
 ]
 
 [[package]]
 name = "quote"
-version = "1.0.28"
+version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9ab9c7eadfd8df19006f1cf1a4aed13540ed5cbc047010ece5826e10825488"
+checksum = "50f3b39ccfb720540debaa0164757101c08ecb8d326b15358ce76a62c7e85965"
 dependencies = [
  "proc-macro2",
 ]
@@ -279,9 +290,9 @@ checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "serde"
-version = "1.0.163"
+version = "1.0.183"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2113ab51b87a539ae008b5c6c02dc020ffa39afd2d83cffcb3f4eb2722cebec2"
+checksum = "32ac8da02677876d532745a130fc9d8e6edfa81a269b107c5b00829b91d8eb3c"
 
 [[package]]
 name = "static_assertions"
@@ -302,9 +313,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.18"
+version = "2.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32d41677bcbe24c20c52e7c70b0d8db04134c5d1066bf98662e2871ad200ea3e"
+checksum = "04361975b3f5e348b2189d8dc55bc942f278b2d482a6a0365de5bdd62d351567"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -334,9 +345,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.8"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5464a87b239f13a63a501f2701565754bae92d243d4bb7eb12f6d57d2269bf4"
+checksum = "301abaae475aa91687eb82514b328ab47a211a533026cb25fc3e519b86adfc3c"
 
 [[package]]
 name = "zeroize"
@@ -355,5 +366,5 @@ checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.18",
+ "syn 2.0.28",
 ]
