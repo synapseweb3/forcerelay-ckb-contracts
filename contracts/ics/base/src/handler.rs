@@ -1,18 +1,11 @@
-use ckb_ics_axon::handler::{
-    handle_channel_open_ack_and_confirm, handle_channel_open_init_and_try,
-    handle_msg_connection_open_ack, handle_msg_connection_open_confirm,
-    handle_msg_connection_open_init, handle_msg_connection_open_try,
-};
-use ckb_ics_axon::message::{
-    Envelope, MsgConnectionOpenAck, MsgConnectionOpenConfirm, MsgConnectionOpenInit,
-    MsgConnectionOpenTry, MsgType,
-};
+use ckb_ics_axon::handler::*;
+use ckb_ics_axon::message::*;
 use ckb_std::ckb_constants::Source;
 use rlp::decode;
 
 use crate::axon_client::AxonClient;
 use crate::error::{Error, Result};
-use crate::utils::{load_channel_cell, load_connection_cell, load_envelope};
+use crate::utils::{load_channel_cell, load_connection_cell, load_envelope, load_packet_cell};
 
 pub enum Navigator {
     CheckMessage(Envelope),
@@ -51,7 +44,7 @@ pub fn navigate_connection() -> Result<Navigator> {
         | MsgType::MsgChannelOpenInit
         | MsgType::MsgChannelOpenTry => Ok(Navigator::CheckMessage(envelope)),
         MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => Ok(Navigator::Skip),
-        _ => Err(Error::UnexpectedMsg),
+        _ => Err(Error::UnexpectedConnectionMsg),
     }
 }
 
@@ -67,7 +60,15 @@ pub fn navigate_channel() -> Result<Navigator> {
         MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket | MsgType::MsgTimeoutPacket => {
             Ok(Navigator::Skip)
         }
-        _ => Err(Error::UnexpectedMsg),
+        _ => Err(Error::UnexpectedChannelMsg),
+    }
+}
+
+pub fn navigate_packet() -> Result<Navigator> {
+    let envelope = load_envelope()?;
+    match envelope.msg_type {
+        MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket => Ok(Navigator::CheckMessage(envelope)),
+        _ => Err(Error::UnexpectedPacketMsg),
     }
 }
 
@@ -135,6 +136,85 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 new_channel_args,
             )
             .map_err(|_| Error::ChannelProofInvalid)
+        }
+        MsgType::MsgSendPacket => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+            let (ibc_packet, packet_args) = load_packet_cell(1, Source::Output)?;
+
+            let msg: MsgSendPacket = decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_send_packet(
+                client,
+                old_channel,
+                old_channel_args,
+                new_channel,
+                new_channel_args,
+                ibc_packet,
+                packet_args,
+                msg,
+            )
+            .map_err(|_| Error::PacketProofInvalid)
+        }
+        MsgType::MsgRecvPacket => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+            let useless_ibc_packet =
+                if let Ok((useless_packet, _)) = load_packet_cell(1, Source::Input) {
+                    Some(useless_packet)
+                } else {
+                    None
+                };
+            let (ibc_packet, packet_args) = load_packet_cell(1, Source::Output)?;
+
+            let msg: MsgRecvPacket = decode(&envelope.content).map_err(|_| Error::Encoding)?;
+            handle_msg_recv_packet(
+                client,
+                old_channel,
+                old_channel_args,
+                new_channel,
+                new_channel_args,
+                useless_ibc_packet,
+                ibc_packet,
+                packet_args,
+                msg,
+            )
+            .map_err(|_| Error::PacketProofInvalid)
+        }
+        MsgType::MsgWriteAckPacket => {
+            let (old_ibc_packet, old_packet_args) = load_packet_cell(0, Source::Input)?;
+            let (new_ibc_packet, new_packet_args) = load_packet_cell(0, Source::Output)?;
+
+            let msg: MsgWriteAckPacket =
+                decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_write_ack_packet(
+                old_ibc_packet,
+                old_packet_args,
+                new_ibc_packet,
+                new_packet_args,
+                msg,
+            )
+            .map_err(|_| Error::PacketProofInvalid)
+        }
+        MsgType::MsgAckPacket => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+            let (old_ibc_packet, old_packet_args) = load_packet_cell(1, Source::Input)?;
+            let (new_ibc_packet, new_packet_args) = load_packet_cell(1, Source::Output)?;
+
+            let msg: MsgAckPacket = decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_ack_packet(
+                client,
+                old_channel,
+                old_channel_args,
+                new_channel,
+                new_channel_args,
+                old_ibc_packet,
+                old_packet_args,
+                new_ibc_packet,
+                new_packet_args,
+                msg,
+            )
+            .map_err(|_| Error::PacketProofInvalid)
         }
         _ => Err(Error::UnexpectedMsg),
     }

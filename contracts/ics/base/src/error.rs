@@ -13,6 +13,10 @@ pub enum Error {
     UnknownSysError,
 
     UnexpectedMsg,
+    UnexpectedConnectionMsg,
+    UnexpectedChannelMsg,
+    UnexpectedPacketMsg,
+    MetadataSerde,
 
     PacketEncoding,
     ChannelEncoding,
@@ -21,9 +25,9 @@ pub enum Error {
     MsgEncoding,
 
     WitnessIsIncorrect,
-    WitnessIsNotExisted,
-    WitnessInputOrOutputIsNone,
-    CellDataUnmatch,
+    ConnectionWitnessInputOrOutputIsNone,
+    ChannelWitnessInputOrOutputIsNone,
+    PacketWitnessInputOrOutputIsNone,
 
     FailedToLoadClientCellData,
     FailedToLoadClientTypeScript,
@@ -34,6 +38,7 @@ pub enum Error {
     ChannelProofInvalid,
     PacketProofInvalid,
 
+    CellDataUnmatch,
     ConnectionHashUnmatch,
     ChannelHashUnmatch,
     PacketHashUnmatch,

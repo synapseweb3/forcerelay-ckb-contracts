@@ -8,7 +8,6 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
-ckb-standalone-types = { version = "0.1.2", default-features = false }
 ics-base = { version = "*", path = "../base" }
 
 [features]

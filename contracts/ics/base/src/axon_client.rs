@@ -8,6 +8,9 @@ use ckb_ics_axon::proof::ObjectProof;
 use ckb_ics_axon::verify_message;
 use molecule::prelude::Entity;
 
+use crate::error::Error;
+
+#[derive(Default)]
 pub struct AxonClient {
     pub id: [u8; 32],
     pub validators: Vec<Validator>,
@@ -67,8 +70,4 @@ impl AxonClient {
             validators: client_validators,
         })
     }
-}
-
-pub enum Error {
-    MetadataSerde,
 }

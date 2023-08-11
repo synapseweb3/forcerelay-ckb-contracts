@@ -1,6 +1,6 @@
-use ckb_ics_axon::handler::{IbcChannel, IbcConnections};
+use ckb_ics_axon::handler::{IbcChannel, IbcConnections, IbcPacket};
 use ckb_ics_axon::message::Envelope;
-use ckb_ics_axon::{ChannelArgs, ConnectionArgs};
+use ckb_ics_axon::{ChannelArgs, ConnectionArgs, PacketArgs};
 use ckb_std::{ckb_constants::Source, high_level as hl};
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
@@ -36,7 +36,7 @@ pub fn load_connection_cell(
     let expected_hash: [u8; 32] = cell_data.try_into().map_err(|_| Error::CellDataUnmatch)?;
 
     if witness_data.is_none() {
-        return Err(Error::WitnessInputOrOutputIsNone);
+        return Err(Error::ConnectionWitnessInputOrOutputIsNone);
     }
 
     let witness_bytes = witness_data.to_opt().unwrap();
@@ -67,7 +67,7 @@ pub fn load_channel_cell(idx: usize, source: Source) -> Result<(IbcChannel, Chan
     let expected_hash: [u8; 32] = cell_data.try_into().map_err(|_| Error::CellDataUnmatch)?;
 
     if witness_data.is_none() {
-        return Err(Error::WitnessInputOrOutputIsNone);
+        return Err(Error::ChannelWitnessInputOrOutputIsNone);
     }
 
     let witness_bytes = witness_data.to_opt().unwrap();
@@ -79,6 +79,36 @@ pub fn load_channel_cell(idx: usize, source: Source) -> Result<(IbcChannel, Chan
 
     let channel: IbcChannel = decode(&witness_slice).map_err(|_| Error::ChannelEncoding)?;
     Ok((channel, channel_args))
+}
+
+pub fn load_packet_cell(idx: usize, source: Source) -> Result<(IbcPacket, PacketArgs)> {
+    let lock = hl::load_cell_lock(idx, source).map_err(|_| Error::PacketLock)?;
+    let lock_args = lock.args().raw_data();
+    let packet_args = PacketArgs::from_slice(&lock_args).map_err(|_| Error::PacketLock)?;
+
+    let witness_args = hl::load_witness_args(idx, source)?;
+    let witness_data = if source == Source::Input {
+        witness_args.input_type()
+    } else {
+        witness_args.output_type()
+    };
+
+    let cell_data = hl::load_cell_data(idx, source)?;
+    let expected_hash: [u8; 32] = cell_data.try_into().map_err(|_| Error::CellDataUnmatch)?;
+
+    if witness_data.is_none() {
+        return Err(Error::PacketWitnessInputOrOutputIsNone);
+    }
+
+    let witness_bytes = witness_data.to_opt().unwrap();
+    let witness_slice = witness_bytes.raw_data();
+
+    if keccak256(&witness_slice) != expected_hash {
+        return Err(Error::PacketHashUnmatch);
+    }
+
+    let packet: IbcPacket = decode(&witness_slice).map_err(|_| Error::PacketEncoding)?;
+    Ok((packet, packet_args))
 }
 
 pub fn load_envelope() -> Result<Envelope> {
