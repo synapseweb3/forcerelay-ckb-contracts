@@ -1,4 +1,5 @@
 #![no_std]
+extern crate alloc;
 
 pub mod axon_client;
 pub mod error;

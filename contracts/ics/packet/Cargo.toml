@@ -10,11 +10,11 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 ckb-std = "0.13.0"
 rlp = { version = "0.5.2", default-features = false }
 ckb-standalone-types = { version = "0.1.2", default-features = false }
-ics-base = { version = "*", path = "../base" }
+ics-base = { path = "../base" }
 
 [features]
 default = []
-debugging = ["ics-base/debugging"]
+debugging = []
 
 [profile.release]
 overflow-checks = true

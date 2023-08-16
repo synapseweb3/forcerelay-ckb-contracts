@@ -1,4 +1,3 @@
-extern crate alloc;
 use alloc::vec::Vec;
 use axon_tools_riscv::types::{AxonBlock, Proof as AxonProof, Validator};
 use axon_types::metadata::Metadata;
@@ -18,7 +17,7 @@ pub struct AxonClient {
 
 impl Client for AxonClient {
     fn verify_object<O: Object>(&mut self, obj: O, proof: ObjectProof) -> Result<(), VerifyError> {
-        #[cfg(feature = "debugging")]
+        // FIXME: debug use
         if self.validators.is_empty() {
             return Ok(());
         }

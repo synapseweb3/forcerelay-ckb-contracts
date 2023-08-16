@@ -15,10 +15,6 @@ rlp = { version = "0.5.2", default-features = false }
 tiny-keccak = { version = "2.0.2", features = ["keccak"] }
 molecule = { version = "0.7", default-features = false }
 
-[features]
-default = ["debugging"]
-debugging = []
-
 [profile.release]
 overflow-checks = true
 lto = false
