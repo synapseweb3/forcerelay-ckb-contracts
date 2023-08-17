@@ -13,7 +13,7 @@ ckb-std = "0.13.0"
 [dependencies.eth_light_client_in_ckb-verification]
 version = "0.3.0-alpha"
 git = "https://github.com/synapseweb3/eth-light-client-in-ckb"
-rev = "99e8239"
+rev = "9325266"
 default-features = false
 features = ["ckb-vm"]
 
