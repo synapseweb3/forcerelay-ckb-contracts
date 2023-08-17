@@ -4,31 +4,13 @@ use ckb_std::ckb_constants::Source;
 use rlp::decode;
 
 use crate::axon_client::AxonClient;
-use crate::error::{Error, Result};
+use crate::error::{CkbResult, Error, Result};
 use crate::utils::{load_channel_cell, load_connection_cell, load_envelope, load_packet_cell};
 
 pub enum Navigator {
     CheckMessage(Envelope),
     CheckClient,
     Skip,
-}
-
-macro_rules! handle_single_connection_msg {
-    ($msgty:ty, $content:expr, $client:ident, $handler:ident) => {{
-        let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
-        let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
-
-        let msg: $msgty = decode($content).map_err(|_| Error::MsgEncoding)?;
-        $handler(
-            $client,
-            old_connections,
-            old_connection_args,
-            new_connections,
-            new_connection_args,
-            msg,
-        )
-        .map_err(|_| Error::ConnectionProofInvalid)
-    }};
 }
 
 pub fn navigate_connection() -> Result<Navigator> {
@@ -72,7 +54,25 @@ pub fn navigate_packet() -> Result<Navigator> {
     }
 }
 
-pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
+macro_rules! handle_single_connection_msg {
+    ($msgty:ty, $content:expr, $client:ident, $handler:ident) => {{
+        let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
+        let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
+
+        let msg: $msgty = decode($content).map_err(|_| Error::MsgEncoding)?;
+        $handler(
+            $client,
+            old_connections,
+            old_connection_args,
+            new_connections,
+            new_connection_args,
+            msg,
+        )
+        .map_err(Into::into)
+    }};
+}
+
+pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
     match envelope.msg_type {
         MsgType::MsgConnectionOpenInit => {
             handle_single_connection_msg!(
@@ -121,7 +121,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 new_connections,
                 new_connection_args,
             )
-            .map_err(|_| Error::ChannelProofInvalid)
+            .map_err(Into::into)
         }
         MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
@@ -135,7 +135,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 new_channel,
                 new_channel_args,
             )
-            .map_err(|_| Error::ChannelProofInvalid)
+            .map_err(Into::into)
         }
         MsgType::MsgSendPacket => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
@@ -153,7 +153,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 packet_args,
                 msg,
             )
-            .map_err(|_| Error::PacketProofInvalid)
+            .map_err(Into::into)
         }
         MsgType::MsgRecvPacket => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
@@ -178,7 +178,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 packet_args,
                 msg,
             )
-            .map_err(|_| Error::PacketProofInvalid)
+            .map_err(Into::into)
         }
         MsgType::MsgWriteAckPacket => {
             let (old_ibc_packet, old_packet_args) = load_packet_cell(0, Source::Input)?;
@@ -193,7 +193,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 new_packet_args,
                 msg,
             )
-            .map_err(|_| Error::PacketProofInvalid)
+            .map_err(Into::into)
         }
         MsgType::MsgAckPacket => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
@@ -214,8 +214,8 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> Result<()> {
                 new_packet_args,
                 msg,
             )
-            .map_err(|_| Error::PacketProofInvalid)
+            .map_err(Into::into)
         }
-        _ => Err(Error::UnexpectedMsg),
+        _ => Err(Error::UnexpectedMsg.into()),
     }
 }

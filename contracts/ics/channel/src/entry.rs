@@ -1,8 +1,8 @@
-use ics_base::error::Result;
+use ics_base::error::CkbResult;
 use ics_base::handler::{navigate_channel, verify, Navigator};
 use ics_base::utils::load_client;
 
-pub fn main() -> Result<()> {
+pub fn main() -> CkbResult<()> {
     let envelope = match navigate_channel()? {
         Navigator::CheckMessage(envelope) => envelope,
         _ => return Ok(()),
