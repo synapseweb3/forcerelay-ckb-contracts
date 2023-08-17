@@ -8,6 +8,6 @@ pub fn main() -> CkbResult<()> {
         _ => return Err(Error::UnexpectedPacketMsg.into()),
     };
 
-    let client = load_client().unwrap_or_default();
+    let client = load_client()?;
     verify(envelope, client)
 }
