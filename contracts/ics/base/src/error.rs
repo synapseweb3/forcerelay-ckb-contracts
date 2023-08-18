@@ -3,6 +3,7 @@ use core::result;
 use ckb_std::error::SysError;
 
 pub type Result<T> = result::Result<T, Error>;
+pub type CkbResult<T> = result::Result<T, i8>;
 
 #[repr(i8)]
 pub enum Error {
@@ -12,25 +13,45 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
+    UnexpectedMsg,
+    UnexpectedConnectionMsg,
+    UnexpectedChannelMsg,
+    UnexpectedPacketMsg,
+    MetadataSerde,
+
+    PacketEncoding,
+    ChannelEncoding,
     ConnectionEncoding,
     EnvelopeEncoding,
     MsgEncoding,
 
     WitnessIsIncorrect,
-    WitnessInputOrOutputIsNone,
-    CellDataUnmatch,
+    ConnectionWitnessInputOrOutputIsNone,
+    ChannelWitnessInputOrOutputIsNone,
+    PacketWitnessInputOrOutputIsNone,
 
     FailedToLoadClientCellData,
     FailedToLoadClientTypeScript,
     FailedToLoadClientId,
     FailedToCreateClient,
 
-    UnexpectedMsg,
-    ConnectionProofInvalid,
+    CellDataUnmatch,
     ConnectionHashUnmatch,
-    ClientCreateWrongClientId,
+    ChannelHashUnmatch,
+    PacketHashUnmatch,
+
     ConnectionLock,
+    ChannelLock,
+    PacketLock,
+
+    ClientCreateWrongClientId,
     ClientCreateWrongConnectionCell,
+}
+
+impl From<Error> for i8 {
+    fn from(value: Error) -> Self {
+        value as i8
+    }
 }
 
 impl From<SysError> for Error {

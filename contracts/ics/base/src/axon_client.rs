@@ -1,6 +1,3 @@
-#![no_std]
-
-extern crate alloc;
 use alloc::vec::Vec;
 use axon_tools_riscv::types::{AxonBlock, Proof as AxonProof, Validator};
 use axon_types::metadata::Metadata;
@@ -10,6 +7,9 @@ use ckb_ics_axon::proof::ObjectProof;
 use ckb_ics_axon::verify_message;
 use molecule::prelude::Entity;
 
+use crate::error::Error;
+
+#[derive(Default)]
 pub struct AxonClient {
     pub id: [u8; 32],
     pub validators: Vec<Validator>,
@@ -17,7 +17,7 @@ pub struct AxonClient {
 
 impl Client for AxonClient {
     fn verify_object<O: Object>(&mut self, obj: O, proof: ObjectProof) -> Result<(), VerifyError> {
-        #[cfg(feature = "debugging")]
+        // FIXME: debug use
         if self.validators.is_empty() {
             return Ok(());
         }
@@ -36,8 +36,8 @@ impl Client for AxonClient {
             .map_err(|_| VerifyError::InvalidReceiptProof)
     }
 
-    fn client_id(&self) -> &[u8] {
-        self.id.as_slice()
+    fn client_id(&self) -> &[u8; 32] {
+        &self.id
     }
 }
 
@@ -69,8 +69,4 @@ impl AxonClient {
             validators: client_validators,
         })
     }
-}
-
-pub enum Error {
-    MetadataSerde,
 }
