@@ -181,8 +181,8 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
             .map_err(Into::into)
         }
         MsgType::MsgWriteAckPacket => {
-            let (old_ibc_packet, old_packet_args) = load_packet_cell(0, Source::Input)?;
-            let (new_ibc_packet, new_packet_args) = load_packet_cell(0, Source::Output)?;
+            let (old_ibc_packet, old_packet_args) = load_packet_cell(1, Source::Input)?;
+            let (new_ibc_packet, new_packet_args) = load_packet_cell(1, Source::Output)?;
 
             let msg: MsgWriteAckPacket =
                 decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
