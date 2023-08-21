@@ -82,7 +82,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=27e1e8e#27e1e8ed9d7e95b180bd148e4b7f0a4dbcb0cc10"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=1dc597c#1dc597c9a744c9aa7a5e9d00d9d8654f9d85e6c1"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -278,9 +278,9 @@ checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "serde"
-version = "1.0.183"
+version = "1.0.185"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32ac8da02677876d532745a130fc9d8e6edfa81a269b107c5b00829b91d8eb3c"
+checksum = "be9b6f69f1dfd54c3b568ffa45c310d6973a5e5148fd40cf515acaf38cf5bc31"
 
 [[package]]
 name = "static_assertions"
