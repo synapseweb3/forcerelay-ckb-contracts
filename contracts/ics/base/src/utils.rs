@@ -126,13 +126,8 @@ pub fn load_envelope() -> Result<Envelope> {
 pub fn load_client() -> Result<AxonClient> {
     let metadata =
         hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::FailedToLoadClientCellData)?;
-    let metadata_type_script = hl::load_cell_type(0, Source::CellDep)
-        .map_err(|_| Error::FailedToLoadClientTypeScript)?
+    let client_id = hl::load_cell_type_hash(0, Source::CellDep)
+        .map_err(|_| Error::FailedToLoadClientId)?
         .unwrap();
-    let client_data = metadata_type_script.args().raw_data();
-    let client_id: [u8; 32] = client_data
-        .as_ref()
-        .try_into()
-        .map_err(|_| Error::FailedToLoadClientId)?;
     AxonClient::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
 }

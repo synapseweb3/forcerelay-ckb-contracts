@@ -31,7 +31,6 @@ pub enum Error {
     PacketWitnessInputOrOutputIsNone,
 
     FailedToLoadClientCellData,
-    FailedToLoadClientTypeScript,
     FailedToLoadClientId,
     FailedToCreateClient,
 
