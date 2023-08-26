@@ -82,7 +82,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=1dc597c#1dc597c9a744c9aa7a5e9d00d9d8654f9d85e6c1"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=7ca20bc#7ca20bc8c08acd0e79a992db670540c064300d10"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -93,9 +93,9 @@ dependencies = [
 
 [[package]]
 name = "ckb-standalone-types"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd206470d9b270fe13f38c4c7fecabf323739f4930ea6f9b80e9490bfa750447"
+checksum = "b5c776d70eb4f60a22a3180857646d77b2da8d33c0c4a063ad9f6610fc94609f"
 dependencies = [
  "cfg-if",
  "molecule",
@@ -286,9 +286,23 @@ checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "serde"
-version = "1.0.185"
+version = "1.0.188"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be9b6f69f1dfd54c3b568ffa45c310d6973a5e5148fd40cf515acaf38cf5bc31"
+checksum = "cf9e0fcba69a370eed61bcf2b728575f726b50b55cba78064753d708ddc7549e"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.188"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4eca7ac642d82aa35b60049a6eccb4be6be75e599bd2e9adb5f875a737654af2"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.29",
+]
 
 [[package]]
 name = "static_assertions"
