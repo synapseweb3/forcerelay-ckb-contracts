@@ -13,11 +13,11 @@ pub enum Error {
     Encoding,
     UnknownSysError,
 
-    UnexpectedMsg,
     UnexpectedConnectionMsg,
     UnexpectedChannelMsg,
     UnexpectedPacketMsg,
     MetadataSerde,
+    BusinessPortNotFound,
 
     PacketEncoding,
     ChannelEncoding,
