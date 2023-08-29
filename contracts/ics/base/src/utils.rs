@@ -131,3 +131,12 @@ pub fn load_client() -> Result<AxonClient> {
         .unwrap();
     AxonClient::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
 }
+
+pub fn check_valid_port_id(port_id: &[u8; 32]) -> Result<()> {
+    let find =
+        hl::QueryIter::new(hl::load_cell_lock_hash, Source::Input).any(|hash| &hash == port_id);
+    if !find {
+        return Err(Error::BusinessPortNotFound);
+    }
+    Ok(())
+}

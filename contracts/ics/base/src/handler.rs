@@ -5,26 +5,30 @@ use rlp::decode;
 
 use crate::axon_client::AxonClient;
 use crate::error::{CkbResult, Error, Result};
-use crate::utils::{load_channel_cell, load_connection_cell, load_envelope, load_packet_cell};
+use crate::utils::{
+    check_valid_port_id, load_channel_cell, load_client, load_connection_cell, load_envelope,
+    load_packet_cell,
+};
 
 pub enum Navigator {
-    CheckMessage(Envelope),
-    CheckClient,
+    CheckMessage(Envelope, AxonClient),
+    CheckClient(AxonClient),
     Skip,
 }
 
 pub fn navigate_connection() -> Result<Navigator> {
     let envelope = load_envelope()?;
+    let client = load_client()?;
     match envelope.msg_type {
         // TODO: move this check code into further IBC_TYPE_ID contract, because the CONNECTION contract
         //       is located in LOCK_SCRIPT which won't execute
-        MsgType::MsgClientCreate => Ok(Navigator::CheckClient),
+        MsgType::MsgClientCreate => Ok(Navigator::CheckClient(client)),
         MsgType::MsgConnectionOpenInit
         | MsgType::MsgConnectionOpenTry
         | MsgType::MsgConnectionOpenAck
         | MsgType::MsgConnectionOpenConfirm
         | MsgType::MsgChannelOpenInit
-        | MsgType::MsgChannelOpenTry => Ok(Navigator::CheckMessage(envelope)),
+        | MsgType::MsgChannelOpenTry => Ok(Navigator::CheckMessage(envelope, client)),
         MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => Ok(Navigator::Skip),
         _ => Err(Error::UnexpectedConnectionMsg),
     }
@@ -32,13 +36,14 @@ pub fn navigate_connection() -> Result<Navigator> {
 
 pub fn navigate_channel() -> Result<Navigator> {
     let envelope = load_envelope()?;
+    let client = load_client()?;
     match envelope.msg_type {
         MsgType::MsgChannelOpenInit
         | MsgType::MsgChannelOpenTry
         | MsgType::MsgChannelOpenAck
         | MsgType::MsgChannelOpenConfirm
         | MsgType::MsgSendPacket
-        | MsgType::MsgRecvPacket => Ok(Navigator::CheckMessage(envelope)),
+        | MsgType::MsgRecvPacket => Ok(Navigator::CheckMessage(envelope, client)),
         MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket | MsgType::MsgTimeoutPacket => {
             Ok(Navigator::Skip)
         }
@@ -49,7 +54,13 @@ pub fn navigate_channel() -> Result<Navigator> {
 pub fn navigate_packet() -> Result<Navigator> {
     let envelope = load_envelope()?;
     match envelope.msg_type {
-        MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket => Ok(Navigator::CheckMessage(envelope)),
+        MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket => {
+            let client = load_client()?;
+            Ok(Navigator::CheckMessage(envelope, client))
+        }
+        MsgType::MsgConsumeAckPacket => {
+            Ok(Navigator::CheckMessage(envelope, AxonClient::default()))
+        }
         _ => Err(Error::UnexpectedPacketMsg),
     }
 }
@@ -141,6 +152,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
             let (ibc_packet, packet_args) = load_packet_cell(1, Source::Output)?;
+            check_valid_port_id(&packet_args.port_id)?;
 
             let msg: MsgSendPacket = decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
             handle_msg_send_packet(
@@ -155,7 +167,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
             )
             .map_err(Into::into)
         }
-        MsgType::MsgRecvPacket => {
+        MsgType::MsgRecvPacket | MsgType::MsgTimeoutPacket => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
             let useless_ibc_packet =
@@ -183,6 +195,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
         MsgType::MsgWriteAckPacket => {
             let (old_ibc_packet, old_packet_args) = load_packet_cell(1, Source::Input)?;
             let (new_ibc_packet, new_packet_args) = load_packet_cell(1, Source::Output)?;
+            check_valid_port_id(&old_packet_args.port_id)?;
 
             let msg: MsgWriteAckPacket =
                 decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
@@ -215,6 +228,14 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
                 msg,
             )
             .map_err(Into::into)
+        }
+        MsgType::MsgConsumeAckPacket => {
+            let (old_ibc_packet, old_packet_args) = load_packet_cell(0, Source::Input)?;
+            check_valid_port_id(&old_packet_args.port_id)?;
+
+            let msg: MsgConsumeAckPacket =
+                decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_consume_ack_packet(old_ibc_packet, old_packet_args, msg).map_err(Into::into)
         }
         _ => Err(Error::UnexpectedMsg.into()),
     }

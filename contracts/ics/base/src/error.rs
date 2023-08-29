@@ -18,6 +18,7 @@ pub enum Error {
     UnexpectedChannelMsg,
     UnexpectedPacketMsg,
     MetadataSerde,
+    BusinessPortNotFound,
 
     PacketEncoding,
     ChannelEncoding,
