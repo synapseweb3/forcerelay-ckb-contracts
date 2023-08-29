@@ -6,27 +6,29 @@ use rlp::decode;
 use crate::axon_client::AxonClient;
 use crate::error::{CkbResult, Error, Result};
 use crate::utils::{
-    check_valid_port_id, load_channel_cell, load_connection_cell, load_envelope, load_packet_cell,
+    check_valid_port_id, load_channel_cell, load_client, load_connection_cell, load_envelope,
+    load_packet_cell,
 };
 
 pub enum Navigator {
-    CheckMessage(Envelope),
-    CheckClient,
+    CheckMessage(Envelope, AxonClient),
+    CheckClient(AxonClient),
     Skip,
 }
 
 pub fn navigate_connection() -> Result<Navigator> {
     let envelope = load_envelope()?;
+    let client = load_client()?;
     match envelope.msg_type {
         // TODO: move this check code into further IBC_TYPE_ID contract, because the CONNECTION contract
         //       is located in LOCK_SCRIPT which won't execute
-        MsgType::MsgClientCreate => Ok(Navigator::CheckClient),
+        MsgType::MsgClientCreate => Ok(Navigator::CheckClient(client)),
         MsgType::MsgConnectionOpenInit
         | MsgType::MsgConnectionOpenTry
         | MsgType::MsgConnectionOpenAck
         | MsgType::MsgConnectionOpenConfirm
         | MsgType::MsgChannelOpenInit
-        | MsgType::MsgChannelOpenTry => Ok(Navigator::CheckMessage(envelope)),
+        | MsgType::MsgChannelOpenTry => Ok(Navigator::CheckMessage(envelope, client)),
         MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => Ok(Navigator::Skip),
         _ => Err(Error::UnexpectedConnectionMsg),
     }
@@ -34,13 +36,14 @@ pub fn navigate_connection() -> Result<Navigator> {
 
 pub fn navigate_channel() -> Result<Navigator> {
     let envelope = load_envelope()?;
+    let client = load_client()?;
     match envelope.msg_type {
         MsgType::MsgChannelOpenInit
         | MsgType::MsgChannelOpenTry
         | MsgType::MsgChannelOpenAck
         | MsgType::MsgChannelOpenConfirm
         | MsgType::MsgSendPacket
-        | MsgType::MsgRecvPacket => Ok(Navigator::CheckMessage(envelope)),
+        | MsgType::MsgRecvPacket => Ok(Navigator::CheckMessage(envelope, client)),
         MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket | MsgType::MsgTimeoutPacket => {
             Ok(Navigator::Skip)
         }
@@ -51,8 +54,12 @@ pub fn navigate_channel() -> Result<Navigator> {
 pub fn navigate_packet() -> Result<Navigator> {
     let envelope = load_envelope()?;
     match envelope.msg_type {
-        MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket | MsgType::MsgConsumeAckPacket => {
-            Ok(Navigator::CheckMessage(envelope))
+        MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket => {
+            let client = load_client()?;
+            Ok(Navigator::CheckMessage(envelope, client))
+        }
+        MsgType::MsgConsumeAckPacket => {
+            Ok(Navigator::CheckMessage(envelope, AxonClient::default()))
         }
         _ => Err(Error::UnexpectedPacketMsg),
     }
