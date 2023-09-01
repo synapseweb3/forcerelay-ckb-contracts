@@ -8,6 +8,8 @@ description = "Utilities for testing IBC CKB contracts."
 homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
 repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
+[workspace]
+
 [dependencies]
 ckb-script    = "0.108.1"
 ckb-types     = "0.108.1"

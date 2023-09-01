@@ -3,6 +3,9 @@ BUILD_ENV_DOCKER := yangby0cryptape/ibc-ckb-contracts-build-env@sha256:71ef760b7
 RUST_TOOLCHAIN_TARGET := riscv64imac-unknown-none-elf
 PROJECT_PREFIX := ibc-ckb_contracts
 
+# Use cross with CARGO=cross
+CARGO ?= cargo
+
 # Enable Debugging with `export CARGO_BUILD_ARGS="--features debugging"`.
 CARGO_BUILD_ARGS ?=
 
@@ -28,51 +31,32 @@ clean-all-contracts:
 
 .PHONY: clean-all-contracts-targets clean-all-contracts-targets-in-docker
 clean-all-contracts-targets:
-	@set -eu; \
-		rootdir="$$(pwd)"; \
-		for contract in ${ALL_CONTRACTS}; do \
-			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
-			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clean; cd "$${rootdir}"; \
-		done
+	cargo clean
+
 clean-all-contracts-targets-in-docker:
 	@docker run --rm -v "$$(pwd):/code" -w "/code" "${BUILD_ENV_DOCKER}" bash -c "make $(subst -in-docker,,$@)"
 
 .PHONY: format-all-contracts format-all-contracts-in-docker
 format-all-contracts:
-	@set -eu; \
-		rootdir="$$(pwd)"; \
-		for contract in ${ALL_CONTRACTS}; do \
-			echo ">>> Format-check \"$${contract}\" contract ..."; \
-			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
-			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo fmt --all -- --check; cd "$${rootdir}"; \
-		done; \
-		echo "[DONE] Format-check all contracts."
+	cargo fmt --all -- --check
+
 format-all-contracts-in-docker:
 	@docker run --rm -v "$$(pwd):/code" -w "/code" "${BUILD_ENV_DOCKER}" bash -c "make $(subst -in-docker,,$@)"
 
 .PHONY: lint-all-contracts lint-all-contracts-in-docker
 lint-all-contracts:
-	@set -eu; \
-		rootdir="$$(pwd)"; \
-		for contract in ${ALL_CONTRACTS}; do \
-			echo ">>> Lint \"$${contract}\" contract ..."; \
-			contract_dir=$$(echo "$${contract}" | tr -s '-' '/'); \
-			cd "${CONTRACTS_DIR}/$${contract_dir}"; cargo clippy --locked -- --deny warnings; cd "$${rootdir}"; \
-		done; \
-		echo "[DONE] Lint all contracts."
+	${CARGO} clippy --all --locked -- --deny warnings
+
 lint-all-contracts-in-docker:
 	@docker run --rm -v "$$(pwd):/code" -w "/code" "${BUILD_ENV_DOCKER}" bash -c "make $(subst -in-docker,,$@)"
 
 ${OUTPUT_DIR}/%:
 	@set -eu; \
-		rootdir="$$(pwd)"; \
 		contract_name="$(notdir $@)"; \
 		contract_filename="${PROJECT_PREFIX}-$${contract_name}"; \
-		contract_dir=$$(echo "$${contract_name}" | tr -s '-' '/'); \
-		cd "${CONTRACTS_DIR}/$${contract_dir}"; \
-			cargo build --release ${CARGO_BUILD_ARGS}; \
-			cp "target/${RUST_TOOLCHAIN_TARGET}/release/$${contract_filename}" "$${rootdir}/${OUTPUT_DIR}/$${contract_name}"; \
-			cd ..;
+		${CARGO} build -p $${contract_filename} --release ${CARGO_BUILD_ARGS}; \
+		cp "target/${RUST_TOOLCHAIN_TARGET}/release/$${contract_filename}" "${OUTPUT_DIR}/$${contract_name}"; \
+		cd ..;
 
 %-in-docker:
 	@set -eu; \

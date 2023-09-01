@@ -15,9 +15,3 @@ ics-base = { path = "../base" }
 [features]
 default = []
 debugging = []
-
-[profile.release]
-overflow-checks = true
-lto = false
-codegen-units = 1
-strip = true
