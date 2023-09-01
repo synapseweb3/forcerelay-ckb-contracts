@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "contracts/eth_light_client/client_type_lock",
+    "contracts/eth_light_client/mock_business_type_lock",
+    "contracts/eth_light_client/verify_bin",
+    "contracts/ics/base",
+    "contracts/ics/connection",
+    "contracts/ics/channel",
+    "contracts/ics/packet",
+    "contracts/mock_contracts/can_update_without_ownership_lock",
+]
+
+[profile.release]
+overflow-checks = true
+strip = true
