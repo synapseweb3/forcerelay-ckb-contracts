@@ -6,6 +6,7 @@ pub type Result<T> = result::Result<T, Error>;
 pub type CkbResult<T> = result::Result<T, i8>;
 
 #[repr(i8)]
+#[derive(Debug)]
 pub enum Error {
     IndexOutOfBound = 1,
     ItemMissing,

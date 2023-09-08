@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "anyhow"
+version = "1.0.75"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
+
+[[package]]
 name = "axon-tools-riscv"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -118,7 +124,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=e7a216bf750448a19a79d80760ad035359784eb9#e7a216bf750448a19a79d80760ad035359784eb9"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=bfd8ab46a1f1f#bfd8ab46a1f1fcef7c5610916849381c61122b90"
 dependencies = [
  "bytes",
  "ethereum-types",
@@ -418,6 +424,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ibc-ckb_contracts-ibc-sudt-transfer"
+version = "0.1.0-alpha.0"
+dependencies = [
+ "ckb-std",
+ "hex",
+ "ics-base",
+ "prost",
+]
+
+[[package]]
 name = "ibc-ckb_contracts-ics-channel"
 version = "0.1.0-alpha.0"
 dependencies = [
@@ -551,6 +567,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "18fb31db3f9bddb2ea821cde30a9f70117e3f119938b5ee630b7403aa6e2ead9"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "prost"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa8473a65b88506c106c28ae905ca4a2b83a2993640467a41bb3080627ddfd2c"
+dependencies = [
+ "bytes",
+ "prost-derive",
+]
+
+[[package]]
+name = "prost-derive"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56075c27b20ae524d00f247b8a4dc333e5784f889fe63099f8e626bc8d73486c"
+dependencies = [
+ "anyhow",
+ "itertools",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.29",
 ]
 
 [[package]]

@@ -44,6 +44,7 @@ jobs:
       image: yangby0cryptape/ibc-ckb-contracts-build-env:0.2.0-alpha.0
     env:
       CARGO_BUILD_ARGS: --features debugging
+      CARGO_PROFILE_RELEASE_DEBUG: true
     steps:
       - name: Checkout the Repository
         uses: actions/checkout@v3
