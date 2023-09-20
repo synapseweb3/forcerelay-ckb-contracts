@@ -5,7 +5,7 @@
 
 > :warning: **WARNING** This repository is still in the proof-of-concept stage.
 
-This project consists of two CKB contracts serving for `Forcerelay/Eth` and `Forcerelay/Axon` respectively.
+This project consists of two types of CKB contracts serving for `Forcerelay/Eth` and `Forcerelay/Axon` respectively.
 
 [License]: https://img.shields.io/badge/License-MIT-blue.svg
 [GitHub Actions]: https://github.com/synapseweb3/ibc-ckb-contracts//workflows/CI/badge.svg
