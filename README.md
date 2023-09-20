@@ -1,14 +1,14 @@
-# IBC CKB Contracts
+# FORCERELAY CKB Contracts
 
 [![License]](#license)
-[![GitHub Actions]](https://github.com/synapseweb3/ibc-ckb-contracts/actions)
+[![GitHub Actions]](https://github.com/synapseweb3/forcerelay-ckb-contracts/actions)
 
 > :warning: **WARNING** This repository is still in the proof-of-concept stage.
 
-This project consists of two types of CKB contracts serving for `Forcerelay/Eth` and `Forcerelay/Axon` respectively.
+This project consists of two CKB contracts serving for `Forcerelay/Eth` and `Forcerelay/Axon` respectively, which are all in one project, [Forcerelay](https://github.com/synapseweb3/forcerelay).
 
 [License]: https://img.shields.io/badge/License-MIT-blue.svg
-[GitHub Actions]: https://github.com/synapseweb3/ibc-ckb-contracts//workflows/CI/badge.svg
+[GitHub Actions]: https://github.com/synapseweb3/forcerelay-ckb-contracts/workflows/CI/badge.svg
 
 ## Contracts for Forcerelay/Eth
 
@@ -34,18 +34,18 @@ For instance, in a transaction representing the `MsgChannelOpenInit` message, a 
 
 ```makefile
 celldeps:
-	connection contract cell
+    connection contract cell
 
 inputs:
-	old connection cell
+    old connection cell
 
 outputs:
-	new connection cell
-	new channel cell
+    new connection cell
+    new channel cell
 
 witnesses:
-	preimage of connection cell
-	preimage of channel cell
+    preimage of connection cell
+    preimage of channel cell
 ```
 
 ## License
