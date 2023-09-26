@@ -7,6 +7,7 @@ members = [
     "contracts/ics/connection",
     "contracts/ics/channel",
     "contracts/ics/packet",
+    "contracts/ibc-app/sudt-transfer",
     "contracts/mock_contracts/can_update_without_ownership_lock",
 ]
 

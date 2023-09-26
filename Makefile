@@ -19,7 +19,8 @@ ALL_CONTRACTS := \
     eth_light_client-mock_business_type_lock \
 	ics-connection \
 	ics-channel \
-	ics-packet
+	ics-packet \
+	ibc-sudt-transfer
 
 .PHONY: all-contracts all-contracts-in-docker
 all-contracts: ${ALL_CONTRACTS}
@@ -108,3 +109,6 @@ ics-channel: ${OUTPUT_DIR}/ics-channel
 
 .PHONY: ics-packet
 ics-packet: ${OUTPUT_DIR}/ics-packet
+
+.PHONY: ibc-sudt-transfer
+ibc-sudt-transfer: ${OUTPUT_DIR}/ibc-sudt-transfer
