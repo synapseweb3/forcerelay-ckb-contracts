@@ -61,6 +61,7 @@ pub fn navigate_packet() -> Result<Navigator> {
         MsgType::MsgConsumeAckPacket => {
             Ok(Navigator::CheckMessage(envelope, AxonClient::default()))
         }
+        MsgType::MsgRecvPacket => Ok(Navigator::Skip),
         _ => Err(Error::UnexpectedPacketMsg),
     }
 }
