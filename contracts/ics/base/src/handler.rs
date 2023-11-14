@@ -42,6 +42,8 @@ pub fn navigate_channel() -> Result<Navigator> {
         | MsgType::MsgChannelOpenTry
         | MsgType::MsgChannelOpenAck
         | MsgType::MsgChannelOpenConfirm
+        | MsgType::MsgChannelCloseInit
+        | MsgType::MsgChannelCloseConfirm
         | MsgType::MsgSendPacket
         | MsgType::MsgRecvPacket => Ok(Navigator::CheckMessage(envelope, client)),
         MsgType::MsgWriteAckPacket | MsgType::MsgAckPacket | MsgType::MsgTimeoutPacket => {
@@ -148,6 +150,24 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
                 new_channel_args,
             )
             .map_err(Into::into)
+        }
+        MsgType::MsgChannelCloseInit => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+
+            let msg: MsgChannelCloseInit =
+                decode(&envelope.content).map_err(|_| Error::Encoding)?;
+            handle_msg_channel_close_init(client, old, old_args, new, new_args, msg)
+                .map_err(Into::into)
+        }
+        MsgType::MsgChannelCloseConfirm => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+
+            let msg: MsgChannelCloseConfirm =
+                decode(&envelope.content).map_err(|_| Error::Encoding)?;
+            handle_msg_channel_close_confirm(client, old, old_args, new, new_args, msg)
+                .map_err(Into::into)
         }
         MsgType::MsgSendPacket => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
