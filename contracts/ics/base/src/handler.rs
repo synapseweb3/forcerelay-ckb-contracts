@@ -154,6 +154,7 @@ pub fn verify(envelope: Envelope, client: AxonClient) -> CkbResult<()> {
         MsgType::MsgChannelCloseInit => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+            check_valid_port_id(&old_channel_args.port_id)?;
 
             let msg: MsgChannelCloseInit =
                 decode(&envelope.content).map_err(|_| Error::Encoding)?;
