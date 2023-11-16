@@ -9,7 +9,9 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 [dependencies]
 ckb-std = "0.13.0"
 ckb-ics-axon = { git = "https://github.com/synapseweb3/ckb-ics.git", rev = "58f256c" }
-axon-tools = { git = "https://github.com/axonweb3/axon.git", package = "axon-tools", rev = "06340ba4", version = "0.1.1", features = ["proof"] }
+axon-tools = { git = "https://github.com/axonweb3/axon.git", package = "axon-tools", rev = "06340ba4", version = "0.1.1", features = [
+    "proof",
+] }
 axon-types = { git = "https://github.com/axonweb3/axon-contract", rev = "8c2338a" }
 rlp = { version = "0.5.2", default-features = false }
 tiny-keccak = { version = "2.0.2", features = ["keccak"] }
