@@ -9,12 +9,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 
 [[package]]
-name = "axon-tools-riscv"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c837f5113835aae14bc402a7a4a9324910134544fe2f7d325b302ce0a27bfeb"
+name = "axon-tools"
+version = "0.1.1"
+source = "git+https://github.com/axonweb3/axon.git?rev=06340ba4#06340ba42a752f9f31d38dab2dd40fa50ab2e239"
 dependencies = [
  "bit-vec",
+ "blst",
  "bytes",
  "ckb-blst",
  "ethereum-types",
@@ -71,6 +71,18 @@ dependencies = [
  "serde",
  "serde_derive",
  "tree_hash",
+ "zeroize",
+]
+
+[[package]]
+name = "blst"
+version = "0.3.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c94087b935a822949d3291a9989ad2b2051ea141eda0fd4e478a75f6aa3e604b"
+dependencies = [
+ "cc",
+ "glob",
+ "threadpool",
  "zeroize",
 ]
 
@@ -393,6 +405,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
+name = "hermit-abi"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d77f7ec81a6d05a3abb01ab6eb7590f6083d08449fe5a1c8b1e620283546ccb7"
+
+[[package]]
 name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -470,7 +488,7 @@ dependencies = [
 name = "ics-base"
 version = "0.1.0"
 dependencies = [
- "axon-tools-riscv",
+ "axon-tools",
  "axon-types",
  "ckb-ics-axon",
  "ckb-std",
@@ -547,6 +565,16 @@ dependencies = [
 name = "molecule2"
 version = "0.1.0"
 source = "git+https://github.com/axonweb3/axon-contract?rev=8c2338a#8c2338ad5a3b32f260b5da234536f2681bf7712b"
+
+[[package]]
+name = "num_cpus"
+version = "1.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
+dependencies = [
+ "hermit-abi",
+ "libc",
+]
 
 [[package]]
 name = "primitive-types"
@@ -719,6 +747,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "threadpool"
+version = "1.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
+dependencies = [
+ "num_cpus",
 ]
 
 [[package]]
