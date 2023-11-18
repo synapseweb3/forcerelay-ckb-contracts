@@ -1,3 +1,4 @@
+use ckb_ics_axon::axon_client::AxonClient;
 use ckb_ics_axon::handler::{IbcChannel, IbcConnections, IbcPacket};
 use ckb_ics_axon::message::Envelope;
 use ckb_ics_axon::{ChannelArgs, ConnectionArgs, PacketArgs};
@@ -5,7 +6,6 @@ use ckb_std::{ckb_constants::Source, high_level as hl};
 use rlp::decode;
 use tiny_keccak::{Hasher as _, Keccak};
 
-use crate::axon_client::AxonClient;
 use crate::error::{Error, Result};
 
 pub fn keccak256(slice: &[u8]) -> [u8; 32] {
@@ -123,13 +123,19 @@ pub fn load_envelope() -> Result<Envelope> {
     decode::<Envelope>(envelope_slice).map_err(|_| Error::EnvelopeEncoding)
 }
 
-pub fn load_client() -> Result<AxonClient> {
+pub fn load_client(
+    metadata_type_id: [u8; 32],
+    ibc_handler_address: [u8; 20],
+) -> Result<AxonClient> {
     let metadata =
         hl::load_cell_data(0, Source::CellDep).map_err(|_| Error::FailedToLoadClientCellData)?;
-    let client_id = hl::load_cell_type_hash(0, Source::CellDep)
+    let type_id = hl::load_cell_type_hash(0, Source::CellDep)
         .map_err(|_| Error::FailedToLoadClientId)?
         .unwrap();
-    AxonClient::new(client_id, &metadata).map_err(|_| Error::FailedToCreateClient)
+    if metadata_type_id != type_id {
+        return Err(Error::FailedToLoadClientId);
+    }
+    AxonClient::new(ibc_handler_address, &metadata).map_err(|_| Error::FailedToCreateClient)
 }
 
 pub fn check_valid_port_id(port_id: &[u8; 32]) -> Result<()> {
