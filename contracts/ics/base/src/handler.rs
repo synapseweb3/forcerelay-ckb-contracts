@@ -61,7 +61,7 @@ pub fn navigate_packet() -> Result<Navigator> {
 }
 
 macro_rules! handle_single_connection_msg {
-    ($msgty:ty, $content:expr, $handler:ident) => {{
+    ($msgty:ty, $commitments:expr, $content:expr, $handler:ident) => {{
         let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
         let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
         let client = load_client(
@@ -76,6 +76,7 @@ macro_rules! handle_single_connection_msg {
             old_connection_args,
             new_connections,
             new_connection_args,
+            $commitments,
             msg,
         )
         .map_err(Into::into)
@@ -83,17 +84,31 @@ macro_rules! handle_single_connection_msg {
 }
 
 pub fn verify(envelope: Envelope) -> CkbResult<()> {
+    let commitments = &envelope.commitments[..];
+
     match envelope.msg_type {
         MsgType::MsgConnectionOpenInit => {
-            handle_single_connection_msg!(
-                MsgConnectionOpenInit,
-                &envelope.content,
-                handle_msg_connection_open_init
+            let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
+            let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
+            let _client = load_client(
+                old_connection_args.metadata_type_id,
+                old_connection_args.ibc_handler_address,
+            )?;
+            let _msg: MsgConnectionOpenInit =
+                decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            handle_msg_connection_open_init(
+                old_connections,
+                old_connection_args,
+                new_connections,
+                new_connection_args,
+                commitments,
             )
+            .map_err(Into::into)
         }
         MsgType::MsgConnectionOpenTry => {
             handle_single_connection_msg!(
                 MsgConnectionOpenTry,
+                commitments,
                 &envelope.content,
                 handle_msg_connection_open_try
             )
@@ -101,6 +116,7 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
         MsgType::MsgConnectionOpenAck => {
             handle_single_connection_msg!(
                 MsgConnectionOpenAck,
+                commitments,
                 &envelope.content,
                 handle_msg_connection_open_ack
             )
@@ -108,11 +124,33 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
         MsgType::MsgConnectionOpenConfirm => {
             handle_single_connection_msg!(
                 MsgConnectionOpenConfirm,
+                commitments,
                 &envelope.content,
                 handle_msg_connection_open_confirm
             )
         }
-        MsgType::MsgChannelOpenInit | MsgType::MsgChannelOpenTry => {
+        MsgType::MsgChannelOpenInit => {
+            let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
+            let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
+            let (new_channel, new_channel_args) = load_channel_cell(1, Source::Output)?;
+
+            let _client = load_client(
+                old_connection_args.metadata_type_id,
+                old_connection_args.ibc_handler_address,
+            )?;
+
+            handle_msg_channel_open_init(
+                old_connections,
+                old_connection_args,
+                new_connections,
+                new_connection_args,
+                new_channel,
+                new_channel_args,
+                commitments,
+            )
+            .map_err(Into::into)
+        }
+        MsgType::MsgChannelOpenTry => {
             let (old_connections, old_connection_args) = load_connection_cell(0, Source::Input)?;
             let (new_connections, new_connection_args) = load_connection_cell(0, Source::Output)?;
             let (new_channel, new_channel_args) = load_channel_cell(1, Source::Output)?;
@@ -121,20 +159,22 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 old_connection_args.metadata_type_id,
                 old_connection_args.ibc_handler_address,
             )?;
+            let msg = decode(&envelope.content).map_err(|_| Error::Encoding)?;
 
-            handle_channel_open_init_and_try(
+            handle_msg_channel_open_try(
                 client,
-                new_channel,
-                new_channel_args,
-                envelope,
                 old_connections,
                 old_connection_args,
                 new_connections,
                 new_connection_args,
+                new_channel,
+                new_channel_args,
+                commitments,
+                msg,
             )
             .map_err(Into::into)
         }
-        MsgType::MsgChannelOpenAck | MsgType::MsgChannelOpenConfirm => {
+        MsgType::MsgChannelOpenAck => {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
 
@@ -142,14 +182,37 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 old_channel_args.metadata_type_id,
                 old_channel_args.ibc_handler_address,
             )?;
+            let msg = decode(&envelope.content).map_err(|_| Error::Encoding)?;
 
-            handle_channel_open_ack_and_confirm(
+            handle_msg_channel_open_ack(
                 client,
-                envelope,
                 old_channel,
                 old_channel_args,
                 new_channel,
                 new_channel_args,
+                commitments,
+                msg,
+            )
+            .map_err(Into::into)
+        }
+        MsgType::MsgChannelOpenConfirm => {
+            let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
+            let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
+
+            let client = load_client(
+                old_channel_args.metadata_type_id,
+                old_channel_args.ibc_handler_address,
+            )?;
+            let msg = decode(&envelope.content).map_err(|_| Error::Encoding)?;
+
+            handle_msg_channel_open_confirm(
+                client,
+                old_channel,
+                old_channel_args,
+                new_channel,
+                new_channel_args,
+                commitments,
+                msg,
             )
             .map_err(Into::into)
         }
@@ -157,22 +220,21 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
             let (old_channel, old_channel_args) = load_channel_cell(0, Source::Input)?;
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
 
-            let client = load_client(
+            let _client = load_client(
                 old_channel_args.metadata_type_id,
                 old_channel_args.ibc_handler_address,
             )?;
 
             check_valid_port_id(&old_channel_args.port_id)?;
 
-            let msg: MsgChannelCloseInit =
+            let _msg: MsgChannelCloseInit =
                 decode(&envelope.content).map_err(|_| Error::Encoding)?;
             handle_msg_channel_close_init(
-                client,
                 old_channel,
                 old_channel_args,
                 new_channel,
                 new_channel_args,
-                msg,
+                commitments,
             )
             .map_err(Into::into)
         }
@@ -193,6 +255,7 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 old_channel_args,
                 new_channel,
                 new_channel_args,
+                commitments,
                 msg,
             )
             .map_err(Into::into)
@@ -202,23 +265,22 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
             let (ibc_packet, packet_args) = load_packet_cell(1, Source::Output)?;
 
-            let client = load_client(
+            let _client = load_client(
                 old_channel_args.metadata_type_id,
                 old_channel_args.ibc_handler_address,
             )?;
 
             check_valid_port_id(&packet_args.port_id)?;
 
-            let msg: MsgSendPacket = decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
+            let _msg: MsgSendPacket = decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
             handle_msg_send_packet(
-                client,
                 old_channel,
                 old_channel_args,
                 new_channel,
                 new_channel_args,
                 ibc_packet,
                 packet_args,
-                msg,
+                commitments,
             )
             .map_err(Into::into)
         }
@@ -249,6 +311,7 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 useless_ibc_packet,
                 ibc_packet,
                 packet_args,
+                commitments,
                 msg,
             )
             .map_err(Into::into)
@@ -258,14 +321,13 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
             let (new_channel, new_channel_args) = load_channel_cell(0, Source::Output)?;
             let (old_ibc_packet, old_packet_args) = load_packet_cell(1, Source::Input)?;
             let (new_ibc_packet, new_packet_args) = load_packet_cell(1, Source::Output)?;
-            // XXX: write ack doesn't need client?
             let _client = load_client(
                 old_channel_args.metadata_type_id,
                 old_channel_args.ibc_handler_address,
             )?;
             check_valid_port_id(&old_packet_args.port_id)?;
 
-            let msg: MsgWriteAckPacket =
+            let _msg: MsgWriteAckPacket =
                 decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
             handle_msg_write_ack_packet(
                 old_channel,
@@ -276,7 +338,7 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 old_packet_args,
                 new_ibc_packet,
                 new_packet_args,
-                msg,
+                commitments,
             )
             .map_err(Into::into)
         }
@@ -301,6 +363,7 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
                 old_packet_args,
                 new_ibc_packet,
                 new_packet_args,
+                commitments,
                 msg,
             )
             .map_err(Into::into)
@@ -309,9 +372,9 @@ pub fn verify(envelope: Envelope) -> CkbResult<()> {
             let (old_ibc_packet, old_packet_args) = load_packet_cell(0, Source::Input)?;
             check_valid_port_id(&old_packet_args.port_id)?;
 
-            let msg: MsgConsumeAckPacket =
+            let _msg: MsgConsumeAckPacket =
                 decode(&envelope.content).map_err(|_| Error::MsgEncoding)?;
-            handle_msg_consume_ack_packet(old_ibc_packet, old_packet_args, msg).map_err(Into::into)
+            handle_msg_consume_ack_packet(old_ibc_packet, commitments).map_err(Into::into)
         }
         _ => Err(Error::UnexpectedMsg.into()),
     }

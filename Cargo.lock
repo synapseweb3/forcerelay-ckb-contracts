@@ -29,7 +29,7 @@ dependencies = [
 [[package]]
 name = "axon-tools"
 version = "0.1.1"
-source = "git+https://github.com/axonweb3/axon.git?rev=06340ba4#06340ba42a752f9f31d38dab2dd40fa50ab2e239"
+source = "git+https://github.com/axonweb3/axon.git?rev=c92fbf3c#c92fbf3c09bddb006141a6677029d0dd7b85bb1c"
 dependencies = [
  "bit-vec",
  "blst",
@@ -166,7 +166,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=012c6c2a4b1#012c6c2a4b1ee7f6d56e8a80347c7de664ee4374"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=4e89e76d16#4e89e76d16a46baf5cceb1213b47c50f7d266506"
 dependencies = [
  "axon-tools",
  "axon-types",
@@ -924,9 +924,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.105"
+version = "1.0.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "693151e1ac27563d6dbcec9dee9fbd5da8539b20fa14ad3752b2e6d363ace360"
+checksum = "3d1c7e3eac408d115102c4c24ad393e0821bb3a5df4d506a80f85f7a742a526b"
 dependencies = [
  "itoa",
  "ryu",
@@ -946,9 +946,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.11.0"
+version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62bb4feee49fdd9f707ef802e22365a35de4b7b299de4763d44bfea899442ff9"
+checksum = "4dccd0940a2dcdf68d092b8cbab7dc0ad8fa938bf95787e1b916b0e3d0e8e970"
 
 [[package]]
 name = "static_assertions"
