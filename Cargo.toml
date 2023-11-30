@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "contracts/eth_light_client/client_type_lock",
     "contracts/eth_light_client/mock_business_type_lock",
