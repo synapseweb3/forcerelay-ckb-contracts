@@ -10,6 +10,8 @@ repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
 
 [dependencies]
 ckb-std = "0.13.0"
+atomics-polyfill = { path = "../../../crates/atomics-polyfill" }
+
 [dependencies.eth_light_client_in_ckb-verification]
 version = "0.3.0-alpha"
 git = "https://github.com/synapseweb3/eth-light-client-in-ckb"
