@@ -1,0 +1,12 @@
+[package]
+name = "atomics-polyfill"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/synapseweb3/ibc-ckb-contracts"
+repository = "https://github.com/synapseweb3/ibc-ckb-contracts"
+
+[lib]
+
+[build-dependencies]
+cc = "1.0.83"

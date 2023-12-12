@@ -16,6 +16,8 @@ use ckb_std::default_alloc;
 ckb_std::entry!(program_entry);
 default_alloc!();
 
+atomics_polyfill::use_atomics_polyfill!();
+
 fn program_entry() -> i8 {
     match entry::main() {
         Ok(_) => 0,
