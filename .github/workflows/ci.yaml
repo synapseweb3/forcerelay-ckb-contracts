@@ -9,7 +9,7 @@ defaults:
     shell: bash
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: -D warnings
+  RUSTFLAGS: -D warnings -C target-feature=-a
   RUST_BACKTRACE: full
   RUST_TOOLCHAIN: 1.68.2
 jobs:
