@@ -173,7 +173,7 @@ dependencies = [
 [[package]]
 name = "ckb-ics-axon"
 version = "0.1.0"
-source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=043ad63#043ad63616804580fdfdf979c105f68d9d013e0a"
+source = "git+https://github.com/synapseweb3/ckb-ics.git?rev=b988d93#b988d93384f8de01cf56d075955b86d702468384"
 dependencies = [
  "axon-tools",
  "axon-types",
